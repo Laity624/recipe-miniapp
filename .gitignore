@@ -32,5 +32,5 @@ yarn-error.log*
 *.temp
 nul
 
-# Claude Code 本地配置
-.claude/settings.local.json
+# Claude Code 配置和技能
+.claude/
