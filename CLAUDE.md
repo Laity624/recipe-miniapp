@@ -5,3 +5,6 @@
 4、设计文档在此目录：docs/plans/2026-02-03-recipe-miniapp-design.md
 5、UI设计规范在此目录：docs/plans/UI.md
 6、颜色变量和字体变量在此文件：src/uni.scss
+
+
+7、接收到需求后，你先理解并给出实现方案，询问我是否同意，同意后你再开发
