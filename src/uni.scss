@@ -14,63 +14,77 @@
 
 /* 颜色变量 */
 
-/* 行为相关颜色 */
-$uni-color-primary: #007aff;
-$uni-color-success: #4cd964;
-$uni-color-warning: #f0ad4e;
-$uni-color-error: #dd524d;
+/* ==============================
+   UI Design System - Global Variables
+   ============================== */
 
-/* 文字基本颜色 */
-$uni-text-color: #333; // 基本色
-$uni-text-color-inverse: #fff; // 反色
-$uni-text-color-grey: #999; // 辅助灰色，如加载更多的提示信息
-$uni-text-color-placeholder: #808080;
-$uni-text-color-disable: #c0c0c0;
+/* --- 1. Color Palette --- */
+$uni-color-primary: #FF9F7F;        // 主色：暖柿色
+$uni-color-primary-dark: #E88D6E;   // 主色点击态
+$uni-color-primary-light: rgba(255, 159, 127, 0.15); // 主色浅底
 
-/* 背景颜色 */
-$uni-bg-color: #fff;
-$uni-bg-color-grey: #f8f8f8;
-$uni-bg-color-hover: #f1f1f1; // 点击状态颜色
-$uni-bg-color-mask: rgba(0, 0, 0, 0.4); // 遮罩颜色
+$uni-bg-color: #FAFAF8;             // 全局背景：米白
+$uni-bg-color-grey: #F5F5F5;        // 灰色背景（用于分割或ID标签）
+$card-bg: #FFFFFF;                  // 卡片背景
 
-/* 边框颜色 */
-$uni-border-color: #c8c7cc;
+$uni-text-main: #333333;            // 主要文字
+$uni-text-sub: #666666;             // 常规文字
+$uni-text-light: #999999;           // 辅助文字
+$uni-text-placeholder: #CCCCCC;     // 占位符
 
-/* 尺寸变量 */
+/* 功能色 */
+$uni-color-success: #8ABF8A;
+$uni-color-warning: #FFC800;
+$uni-color-error: #FF6B6B;          // 爱心红
 
-/* 文字尺寸 */
-$uni-font-size-sm: 12px;
-$uni-font-size-base: 14px;
-$uni-font-size-lg: 16;
+/* --- 2. Typography --- */
+$uni-font-size-xxl: 42rpx; // 特大标题
+$uni-font-size-xl: 34rpx;  // 页面标题
+$uni-font-size-lg: 30rpx;  // 卡片标题
+$uni-font-size-base: 28rpx; // 正文
+$uni-font-size-sm: 26rpx;  // 次要
+$uni-font-size-xs: 22rpx;  // 辅助
+$uni-font-size-xxs: 20rpx; // 标签
 
-/* 图片尺寸 */
-$uni-img-size-sm: 20px;
-$uni-img-size-base: 26px;
-$uni-img-size-lg: 40px;
+/* --- 3. Border Radius --- */
+$uni-radius-lg: 24rpx;     // 卡片
+$uni-radius-base: 16rpx;   // 常规
+$uni-radius-sm: 8rpx;      // 小标签
+$uni-radius-circle: 50%;   // 圆形
+$uni-radius-capsule: 999rpx; // 胶囊
 
-/* Border Radius */
-$uni-border-radius-sm: 2px;
-$uni-border-radius-base: 3px;
-$uni-border-radius-lg: 6px;
-$uni-border-radius-circle: 50%;
+/* --- 4. Shadows --- */
+$uni-shadow-sm: 0 4rpx 12rpx rgba(0,0,0,0.03); // 静态
+$uni-shadow-base: 0 8rpx 24rpx rgba(0,0,0,0.06); // 悬浮
 
-/* 水平间距 */
-$uni-spacing-row-sm: 5px;
-$uni-spacing-row-base: 10px;
-$uni-spacing-row-lg: 15px;
+/* --- 5. Mixins (常用工具) --- */
 
-/* 垂直间距 */
-$uni-spacing-col-sm: 4px;
-$uni-spacing-col-base: 8px;
-$uni-spacing-col-lg: 12px;
+/* 文本单行省略 */
+@mixin text-truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 
-/* 透明度 */
-$uni-opacity-disabled: 0.3; // 组件禁用态的透明度
+/* 文本多行省略 */
+@mixin text-line-clamp($lines) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $lines;
+  overflow: hidden;
+}
 
-/* 文章场景相关 */
-$uni-color-title: #2c405a; // 文章标题颜色
-$uni-font-size-title: 20px;
-$uni-color-subtitle: #555; // 二级标题颜色
-$uni-font-size-subtitle: 18px;
-$uni-color-paragraph: #3f536e; // 文章段落颜色
-$uni-font-size-paragraph: 15px;
+/* 绝对定位居中 */
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Flex 居中 */
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
