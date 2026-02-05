@@ -1,0 +1,165 @@
+/* pages/enum/manage/manage.wxss */
+
+.enum-manage-container {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  padding: var(--spacing-md);
+}
+
+/* ==================== 顶部操作栏 ==================== */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-md);
+  background-color: var(--card-bg);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-level-1);
+}
+
+.type-title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.title-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.count-text {
+  font-size: 24rpx;
+  color: var(--text-light);
+}
+
+.add-btn {
+  padding: 16rpx 32rpx;
+  font-size: 28rpx;
+  height: auto;
+  line-height: 1.4;
+}
+
+/* ==================== 枚举值列表 ==================== */
+.enum-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.enum-item {
+  padding: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.item-left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex: 1;
+}
+
+.sort-number {
+  width: 48rpx;
+  height: 48rpx;
+  background-color: var(--color-primary-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.item-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  flex: 1;
+}
+
+.item-label {
+  font-size: 30rpx;
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.item-label.disabled {
+  color: var(--text-light);
+  text-decoration: line-through;
+}
+
+.item-value {
+  font-size: 24rpx;
+  color: var(--text-light);
+}
+
+.item-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.more-btn {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  color: var(--text-light);
+  font-weight: bold;
+}
+
+/* ==================== 空状态 ==================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+  gap: var(--spacing-md);
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: var(--text-light);
+  text-align: center;
+}
+
+/* ==================== 弹窗样式 ==================== */
+.dialog-content {
+  padding: var(--spacing-md);
+}
+
+.form-item {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-label {
+  display: block;
+  font-size: 28rpx;
+  color: var(--text-main);
+  margin-bottom: var(--spacing-sm);
+}
+
+.form-input {
+  width: 100%;
+  height: 80rpx;
+  padding: 0 var(--spacing-md);
+  background-color: var(--bg-color);
+  border-radius: var(--radius-base);
+  font-size: 28rpx;
+  color: var(--text-main);
+}

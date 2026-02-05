@@ -64,7 +64,12 @@
 
   <!-- 管理员专属 -->
   <view class="menu-section" wx:if="{{userInfo.isAdmin}}">
-    <view class="menu-item" bindtap="navigateTo" data-url="/pages/enum/manage/manage" hover-class="menu-hover">
+    <view class="admin-badge">
+      <text class="badge-icon">👑</text>
+      <text class="badge-text">管理员专属</text>
+    </view>
+
+    <view class="menu-item" bindtap="navigateTo" data-url="/pages/enum/list/list" hover-class="menu-hover">
       <view class="menu-left">
         <text class="menu-icon">⚙️</text>
         <text class="menu-title">枚举管理</text>
@@ -72,6 +77,9 @@
       <text class="menu-arrow">›</text>
     </view>
   </view>
+
+  
+
 
   <!-- 设置 -->
   <view class="menu-section">
@@ -98,4 +106,3 @@
   </view>
 
 </view>
-

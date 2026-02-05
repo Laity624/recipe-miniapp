@@ -1,0 +1,103 @@
+/* pages/enum/list/list.wxss */
+
+.enum-list-container {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  padding: var(--spacing-md);
+}
+
+/* ==================== 页面说明 ==================== */
+.page-tip {
+  background-color: var(--color-primary-light);
+  border-radius: var(--radius-base);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+.tip-icon {
+  font-size: 32rpx;
+  flex-shrink: 0;
+}
+
+.tip-text {
+  font-size: 26rpx;
+  color: var(--text-sub);
+  line-height: 1.6;
+}
+
+/* ==================== 枚举类型列表 ==================== */
+.enum-types {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.enum-type-card {
+  padding: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all 0.3s ease;
+}
+
+.card-hover {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+.card-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.type-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.type-name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.type-count {
+  font-size: 24rpx;
+  color: var(--text-light);
+}
+
+.card-right {
+  display: flex;
+  align-items: center;
+}
+
+.arrow-icon {
+  font-size: 48rpx;
+  color: var(--text-placeholder);
+  font-weight: 300;
+}
+
+/* ==================== 空状态 ==================== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+  gap: var(--spacing-md);
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: var(--text-light);
+}

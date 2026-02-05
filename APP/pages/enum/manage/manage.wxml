@@ -1,0 +1,97 @@
+<!--pages/enum/manage/manage.wxml-->
+<view class="enum-manage-container">
+  <!-- 顶部操作栏 -->
+  <view class="top-bar">
+    <view class="type-title">
+      <text class="title-text">{{typeName}}</text>
+      <text class="count-text">共 {{enumList.length}} 项</text>
+    </view>
+    <button class="add-btn btn-primary" bindtap="showAddDialog">
+      <text>+ 新增</text>
+    </button>
+  </view>
+
+  <!-- 枚举值列表 -->
+  <view class="enum-list">
+    <view
+      class="enum-item card"
+      wx:for="{{enumList}}"
+      wx:key="value"
+    >
+      <!-- 左侧：排序和内容 -->
+      <view class="item-left">
+        <view class="sort-number">{{item.sort + 1}}</view>
+        <view class="item-content">
+          <text class="item-label {{!item.isActive ? 'disabled' : ''}}">
+            {{item.label}}
+          </text>
+          <text class="item-value">值: {{item.value}}</text>
+        </view>
+      </view>
+
+      <!-- 右侧：操作按钮 -->
+      <view class="item-right">
+        <!-- 启用/禁用开关 -->
+        <van-switch
+          checked="{{item.isActive}}"
+          size="20px"
+          active-color="var(--color-primary)"
+          bind:change="toggleActive"
+          data-index="{{index}}"
+        />
+
+        <!-- 更多操作 -->
+        <view class="more-btn" bindtap="showActions" data-index="{{index}}">
+          <text>⋮</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{enumList.length === 0}}">
+    <text class="empty-icon">📝</text>
+    <text class="empty-text">暂无枚举值，点击上方按钮新增</text>
+  </view>
+</view>
+
+<!-- 新增/编辑弹窗 -->
+<van-dialog
+  id="van-dialog"
+  show="{{showDialog}}"
+  title="{{dialogTitle}}"
+  show-cancel-button
+  bind:confirm="handleDialogConfirm"
+  bind:cancel="handleDialogCancel"
+>
+  <view class="dialog-content">
+    <view class="form-item">
+      <text class="form-label">显示文本</text>
+      <input
+        class="form-input"
+        placeholder="请输入显示文本"
+        value="{{formData.label}}"
+        bindinput="onLabelInput"
+      />
+    </view>
+    <view class="form-item">
+      <text class="form-label">枚举值</text>
+      <input
+        class="form-input"
+        type="number"
+        placeholder="请输入枚举值（数字）"
+        value="{{formData.value}}"
+        bindinput="onValueInput"
+        disabled="{{isEdit}}"
+      />
+    </view>
+  </view>
+</van-dialog>
+
+<!-- 操作菜单 -->
+<van-action-sheet
+  show="{{showActionSheet}}"
+  actions="{{actions}}"
+  bind:select="onActionSelect"
+  bind:close="onActionClose"
+/>

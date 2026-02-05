@@ -1,0 +1,36 @@
+<!--pages/enum/list/list.wxml-->
+<view class="enum-list-container">
+  <!-- 页面说明 -->
+  <view class="page-tip">
+    <text class="tip-icon">ℹ️</text>
+    <text class="tip-text">管理菜谱相关的枚举值，如分类、口味、烹饪方式等</text>
+  </view>
+
+  <!-- 枚举类型列表 -->
+  <view class="enum-types">
+    <view
+      class="enum-type-card card"
+      wx:for="{{enumTypes}}"
+      wx:key="type"
+      hover-class="card-hover"
+      bindtap="goToManage"
+      data-type="{{item.type}}"
+    >
+      <view class="card-left">
+        <view class="type-info">
+          <text class="type-name">{{item.name}}</text>
+          <text class="type-count">{{item.count}} 个选项</text>
+        </view>
+      </view>
+      <view class="card-right">
+        <text class="arrow-icon">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{enumTypes.length === 0}}">
+    <text class="empty-icon">📋</text>
+    <text class="empty-text">暂无枚举类型</text>
+  </view>
+</view>

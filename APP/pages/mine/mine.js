@@ -11,17 +11,17 @@ Page({
       recipeCount: 0,
       friendCount: 0,
       favoriteCount: 0,
-      isAdmin: false
+      isAdmin: true  // 测试用，设置为管理员
     }
   },
 
   onLoad(options) {
-    this.loadUserInfo()
+    // this.loadUserInfo()
   },
 
   onShow() {
     // 每次显示时刷新用户信息
-    this.loadUserInfo()
+    // this.loadUserInfo()
   },
 
   // 加载用户信息

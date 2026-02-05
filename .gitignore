@@ -26,3 +26,6 @@ nul
 
 # Claude Code 配置和技能
 .claude/
+
+node_modules/
+miniprogram_npm/

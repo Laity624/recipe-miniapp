@@ -8,7 +8,9 @@
     "pages/recipe/list/list",
     "pages/friend/list/list",
     "pages/friend/search/search",
-    "pages/favorite/favorite"
+    "pages/favorite/favorite",
+    "pages/enum/list/list",
+    "pages/enum/manage/manage"
   ],
   "window": {
     "navigationBarTitleText": "个人菜谱",
