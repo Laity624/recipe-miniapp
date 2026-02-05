@@ -22,6 +22,13 @@ Page({
   onShow() {
     // 每次显示时刷新用户信息
     // this.loadUserInfo()
+
+    // 更新自定义 tab 栏选中状态
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({
+        selected: 1
+      });
+    }
   },
 
   // 加载用户信息

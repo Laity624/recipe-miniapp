@@ -14,6 +14,12 @@ Page({
 
   onShow() {
     // 页面显示时刷新数据
+    // 更新自定义 tab 栏选中状态
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({
+        selected: 0
+      });
+    }
   },
 
   // 加载菜谱数据
