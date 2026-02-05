@@ -1,5 +1,0 @@
-<!--pages/recipes/recipes.wxml-->
-<view class="container">
-  <text>菜谱页面</text>
-</view>
-

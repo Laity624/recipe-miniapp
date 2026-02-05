@@ -1,0 +1,132 @@
+/* pages/login/login.wxss */
+
+.login-container {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--spacing-lg);
+}
+
+/* ==================== 顶部区域 ==================== */
+.login-header {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 120rpx;
+  padding-bottom: 80rpx;
+}
+
+.logo-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.logo-icon {
+  font-size: 120rpx;
+  margin-bottom: var(--spacing-md);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20rpx);
+  }
+}
+
+.app-name {
+  font-size: 42rpx;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: var(--spacing-sm);
+}
+
+.app-slogan {
+  font-size: 26rpx;
+  color: var(--text-light);
+}
+
+/* ==================== 功能亮点 ==================== */
+.features {
+  display: flex;
+  justify-content: space-around;
+  padding: var(--spacing-lg) 0;
+  margin-bottom: 80rpx;
+}
+
+.feature-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.feature-icon {
+  font-size: 48rpx;
+  margin-bottom: var(--spacing-xs);
+}
+
+.feature-text {
+  font-size: 24rpx;
+  color: var(--text-sub);
+}
+
+/* ==================== 登录按钮区域 ==================== */
+.login-actions {
+  padding-bottom: 80rpx;
+}
+
+.login-btn {
+  width: 100%;
+  height: 96rpx;
+  background: linear-gradient(135deg, #FF9F7F, #FF8E66);
+  border-radius: var(--radius-capsule);
+  box-shadow: var(--shadow-diffuse);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.login-btn::after {
+  border: none;
+}
+
+.login-btn-hover {
+  opacity: 0.9;
+  transform: scale(0.98);
+}
+
+.login-btn-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.wechat-icon {
+  font-size: 40rpx;
+}
+
+.login-btn-text {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+/* ==================== 隐私协议 ==================== */
+.privacy-text {
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+.privacy-link {
+  color: var(--color-primary);
+}

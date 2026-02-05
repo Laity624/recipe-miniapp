@@ -1,0 +1,50 @@
+<!--pages/login/login.wxml-->
+<view class="login-container">
+  <!-- 顶部装饰区域 -->
+  <view class="login-header">
+    <!-- Logo 区域 -->
+    <view class="logo-wrapper">
+      <view class="logo-icon">🍳</view>
+      <text class="app-name">个人菜谱</text>
+      <text class="app-slogan">记录美味，分享生活</text>
+    </view>
+  </view>
+
+  <!-- 功能亮点 -->
+  <view class="features">
+    <view class="feature-item">
+      <view class="feature-icon">📝</view>
+      <text class="feature-text">记录专属菜谱</text>
+    </view>
+    <view class="feature-item">
+      <view class="feature-icon">👥</view>
+      <text class="feature-text">好友互相分享</text>
+    </view>
+    <view class="feature-item">
+      <view class="feature-icon">⭐</view>
+      <text class="feature-text">收藏心仪美食</text>
+    </view>
+  </view>
+
+  <!-- 登录按钮区域 -->
+  <view class="login-actions">
+    <button
+      class="login-btn"
+      hover-class="login-btn-hover"
+      bindtap="handleLogin"
+    >
+      <view class="login-btn-content">
+        <text class="wechat-icon">💬</text>
+        <text class="login-btn-text">微信授权登录</text>
+      </view>
+    </button>
+
+    <!-- 隐私协议 -->
+    <view class="privacy-text">
+      <text class="text-light">登录即表示同意</text>
+      <text class="privacy-link">《用户协议》</text>
+      <text class="text-light">和</text>
+      <text class="privacy-link">《隐私政策》</text>
+    </view>
+  </view>
+</view>
