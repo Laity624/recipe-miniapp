@@ -11,6 +11,7 @@
   padding-bottom: calc(16rpx + env(safe-area-inset-bottom));
   border-top: 1rpx solid rgba(0, 0, 0, 0.05);
   z-index: 9999;
+  background-color: #fff;
 }
 
 .tab-item {

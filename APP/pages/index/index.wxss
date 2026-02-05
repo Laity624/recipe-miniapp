@@ -195,7 +195,7 @@
 .fab-btn {
   position: fixed;
   right: 40rpx;
-  bottom: 120rpx;
+  bottom: calc(140rpx + env(safe-area-inset-bottom));
   width: 100rpx;
   height: 100rpx;
   background: linear-gradient(135deg, #FF9F7F, #FF8E66);
