@@ -43,16 +43,25 @@ page {
   --spacing-md: 24rpx;
   --spacing-lg: 32rpx;
   --spacing-xl: 48rpx;
+
+  /* 字体大小 */
+  --font-xs: 20rpx;
+  --font-sm: 24rpx;
+  --font-base: 28rpx;
+  --font-lg: 32rpx;
+  --font-xl: 36rpx;
+  --font-xxl: 40rpx;
 }
 
 /* ==================== 全局样式重置 ==================== */
 page {
+  height: 100vh;
   background-color: var(--bg-color);
   color: var(--text-sub);
   font-size: 28rpx;
   line-height: 1.6;
   font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-  padding-bottom: calc(100rpx + env(safe-area-inset-bottom));
+  padding-bottom: calc(env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 

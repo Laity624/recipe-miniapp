@@ -1,0 +1,58 @@
+/* pages/mine/edit/edit.wxss */
+.edit-page {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  padding-bottom: 40rpx;
+}
+
+/* 头像区域 */
+.avatar-section {
+  padding: 60rpx 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: var(--shadow-level-2);
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+}
+
+.avatar-mask {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60rpx;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.avatar-tip {
+  font-size: 24rpx;
+  color: #FFFFFF;
+}
+
+/* 表单区域 */
+.form-section {
+  margin: 0 var(--spacing-md);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-level-1);
+}
+
+/* 保存按钮 */
+.save-section {
+  margin: 60rpx var(--spacing-md) 0;
+}

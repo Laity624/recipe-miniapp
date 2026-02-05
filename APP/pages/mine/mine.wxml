@@ -8,9 +8,12 @@
       <view class="info">
         <text class="nickname">{{userInfo.nickName || '未登录'}}</text>
         <view class="identity-code-box">
-          <text class="identity-label">身份码:</text>
+          <text class="identity-label">ID：</text>
           <text class="identity-code">{{userInfo.identityCode || '-'}}</text>
         </view>
+      </view>
+      <view class="setting-btn" bindtap="editProfile" hover-class="setting-btn-hover">
+        <text class="setting-icon">✏️</text>
       </view>
     </view>
 

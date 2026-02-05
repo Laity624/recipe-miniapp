@@ -1,7 +1,7 @@
 /* pages/login/login.wxss */
 
 .login-container {
-  min-height: 100vh;
+  min-height: 100%;
   background-color: var(--bg-color);
   display: flex;
   flex-direction: column;
@@ -78,7 +78,7 @@
 
 /* ==================== 登录按钮区域 ==================== */
 .login-actions {
-  padding-bottom: 80rpx;
+  padding-bottom: 40rpx;
 }
 
 .login-btn {

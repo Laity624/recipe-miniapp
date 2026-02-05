@@ -3,6 +3,7 @@
     "pages/login/login",
     "pages/index/index",
     "pages/mine/mine",
+    "pages/mine/edit/edit",
     "pages/recipe/detail/detail",
     "pages/recipe/edit/edit",
     "pages/recipe/list/list",

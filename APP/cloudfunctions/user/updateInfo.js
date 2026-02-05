@@ -2,10 +2,10 @@
  * 更新用户信息
  *
  * 功能描述：
- * 更新用户的个人信息（昵称、个人简介、手机号）
+ * 更新用户的个人信息（头像、昵称、个人简介）
  *
  * 业务逻辑：
- * 1. 参数校验：昵称长度（1-20字符）、简介长度（最多200字符）、手机号格式
+ * 1. 参数校验：昵称长度（1-20字符）、简介长度（最多200字符）、头像URL格式
  * 2. 只更新传入的字段（支持部分更新）
  * 3. 权限校验：只能更新自己的信息
  * 4. 返回更新后的用户信息
@@ -15,9 +15,9 @@
  * - 查询 users 表（返回更新后的数据）
  *
  * 参数：
+ * @param {string} event.avatarUrl - 用户头像（可选，云存储URL）
  * @param {string} event.nickName - 用户昵称（可选，1-20字符）
  * @param {string} event.bio - 个人简介（可选，最多200字符）
- * @param {string} event.phone - 手机号（可选，11位数字）
  *
  * 返回：
  * @returns {Object} { success: true, data: { user } }
@@ -37,7 +37,7 @@ const db = cloud.database();
 const { success, error } = require('./utils');
 
 exports.main = async (event, context) => {
-  const { nickName, bio, phone } = event;
+  const { avatarUrl, nickName, bio } = event;
   const { OPENID } = cloud.getWXContext();
 
   try {
@@ -45,6 +45,12 @@ exports.main = async (event, context) => {
     const updateData = {};
 
     // 2. 参数校验和处理
+    if (avatarUrl !== undefined) {
+      if (avatarUrl && avatarUrl.trim().length > 0) {
+        updateData.avatarUrl = avatarUrl.trim();
+      }
+    }
+
     if (nickName !== undefined) {
       if (nickName.trim().length === 0 || nickName.length > 20) {
         return error('INVALID_PARAMS', '昵称长度必须在 1-20 个字符之间');
@@ -57,15 +63,6 @@ exports.main = async (event, context) => {
         return error('INVALID_PARAMS', '个人简介不能超过 200 个字符');
       }
       updateData.bio = bio.trim();
-    }
-
-    if (phone !== undefined) {
-      // 校验手机号格式（11位数字）
-      const phoneRegex = /^1[3-9]\d{9}$/;
-      if (phone && !phoneRegex.test(phone)) {
-        return error('INVALID_PARAMS', '手机号格式不正确');
-      }
-      updateData.phone = phone;
     }
 
     // 3. 检查是否有需要更新的字段

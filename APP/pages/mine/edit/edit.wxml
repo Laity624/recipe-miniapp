@@ -1,0 +1,53 @@
+<!--pages/mine/edit/edit.wxml-->
+<view class="edit-page">
+
+  <!-- 头像区域 -->
+  <view class="avatar-section">
+    <view class="avatar-wrapper" bindtap="chooseAvatar">
+      <image class="avatar" src="{{avatarUrl}}" mode="aspectFill" />
+      <view class="avatar-mask">
+        <text class="avatar-tip">点击更换头像</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 表单区域 -->
+  <view class="form-section">
+    <van-cell-group>
+      <van-field
+        label="昵称"
+        value="{{nickName}}"
+        placeholder="请输入昵称"
+        maxlength="15"
+        show-word-limit
+        bind:change="onNickNameChange"
+      />
+
+      <van-field
+        label="个人简介"
+        value="{{bio}}"
+        type="textarea"
+        placeholder="介绍一下自己吧~"
+        maxlength="100"
+        show-word-limit
+        autosize
+        bind:change="onBioChange"
+      />
+    </van-cell-group>
+  </view>
+
+  <!-- 保存按钮 -->
+  <view class="save-section">
+    <van-button
+      type="primary"
+      block
+      round
+      bind:click="saveUserInfo"
+      loading="{{saving}}"
+      disabled="{{saving}}"
+    >
+      保存
+    </van-button>
+  </view>
+
+</view>

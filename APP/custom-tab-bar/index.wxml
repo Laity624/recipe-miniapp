@@ -13,8 +13,8 @@
       src="{{selected === index ? item.selectedIconPath : item.iconPath}}"
       mode="aspectFit"
     />
-    <text class="tab-text {{selected === index ? 'active' : ''}}">
+    <view class="tab-text {{selected === index ? 'active' : ''}}">
       {{item.text}}
-    </text>
+    </view>
   </view>
 </view>
