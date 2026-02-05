@@ -1,0 +1,92 @@
+<!--pages/friend/search/search.wxml-->
+<view class="search-page">
+  
+  <!-- 搜索框 -->
+  <view class="search-box">
+    <view class="search-input-wrapper">
+      <text class="search-icon">🔍</text>
+      <input 
+        class="search-input" 
+        placeholder="输入身份码或昵称搜索" 
+        value="{{keyword}}"
+        bindinput="onInput"
+        bindconfirm="onSearch"
+        confirm-type="search"
+        focus="{{true}}"
+      />
+      <text class="clear-icon" wx:if="{{keyword}}" bindtap="clearInput">×</text>
+    </view>
+    <view class="search-btn" bindtap="onSearch">搜索</view>
+  </view>
+
+  <!-- 搜索提示 -->
+  <view class="search-tips" wx:if="{{!hasSearched}}">
+    <text class="tips-icon">💡</text>
+    <text class="tips-text">输入好友的身份码或昵称进行搜索</text>
+  </view>
+
+  <!-- 搜索结果 -->
+  <view class="search-result" wx:if="{{hasSearched}}">
+    
+    <!-- 找到用户 -->
+    <view class="user-card" wx:if="{{userInfo}}">
+      <image class="user-avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      <view class="user-info">
+        <text class="user-name">{{userInfo.nickname}}</text>
+        <view class="user-code">
+          <text class="code-label">身份码:</text>
+          <text class="code-value">{{userInfo.identityCode}}</text>
+        </view>
+        <text class="user-bio">{{userInfo.bio || '这个人很懒，什么都没写~'}}</text>
+        <view class="user-stats">
+          <text class="stat-item">菜谱 {{userInfo.recipeCount || 0}}</text>
+          <text class="stat-divider">·</text>
+          <text class="stat-item">好友 {{userInfo.friendCount || 0}}</text>
+        </view>
+      </view>
+      
+      <!-- 操作按钮 -->
+      <view class="action-area">
+        <view class="add-btn" wx:if="{{!userInfo.isFriend && !userInfo.isPending}}" bindtap="sendRequest">
+          <text class="btn-text">添加好友</text>
+        </view>
+        <view class="pending-btn" wx:if="{{userInfo.isPending}}">
+          <text class="btn-text">已发送申请</text>
+        </view>
+        <view class="friend-btn" wx:if="{{userInfo.isFriend}}">
+          <text class="btn-text">已是好友</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 未找到 -->
+    <view class="not-found" wx:else>
+      <text class="not-found-icon">😕</text>
+      <text class="not-found-text">未找到该用户</text>
+      <text class="not-found-hint">请检查身份码或昵称是否正确</text>
+    </view>
+    
+  </view>
+
+  <!-- 搜索历史 -->
+  <view class="search-history" wx:if="{{!hasSearched && historyList.length > 0}}">
+    <view class="history-header">
+      <text class="history-title">搜索历史</text>
+      <text class="clear-history" bindtap="clearHistory">清空</text>
+    </view>
+    <view class="history-list">
+      <view 
+        class="history-item" 
+        wx:for="{{historyList}}" 
+        wx:key="index"
+        bindtap="searchHistory"
+        data-keyword="{{item}}"
+      >
+        <text class="history-icon">🕐</text>
+        <text class="history-text">{{item}}</text>
+      </view>
+    </view>
+  </view>
+
+</view>
+

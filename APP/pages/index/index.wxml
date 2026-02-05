@@ -1,0 +1,126 @@
+<!--pages/index/index.wxml-->
+<view class="page-container">
+  
+  <!-- 1. 顶部吸顶区域 (搜索 + 筛选) -->
+  <view class="sticky-header">
+    <!-- 搜索栏 -->
+    <view class="search-bar-box">
+      <view class="search-input-bg">
+        <text class="search-icon">🔍</text>
+        <input 
+          class="search-input" 
+          placeholder="搜索菜谱、食材..." 
+          placeholder-class="placeholder-style"
+          confirm-type="search"
+          bindinput="onSearchInput"
+          bindconfirm="onSearchConfirm"
+        />
+      </view>
+    </view>
+
+    <!-- 横向滚动筛选标签 -->
+    <scroll-view class="filter-scroll" scroll-x show-scrollbar="{{false}}">
+      <view class="filter-list">
+        <view 
+          wx:for="{{tags}}" 
+          wx:key="index"
+          class="filter-tag {{currentTag === index ? 'active' : ''}}"
+          bindtap="selectTag"
+          data-index="{{index}}"
+        >
+          {{item}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 占位符，防止内容被吸顶头部遮挡 -->
+  <view class="header-placeholder"></view>
+
+  <!-- 2. 瀑布流内容区 -->
+  <view class="waterfall-container">
+    <!-- 左列 -->
+    <view class="column">
+      <view 
+        class="recipe-card" 
+        wx:for="{{leftList}}" 
+        wx:key="id"
+        bindtap="goToDetail"
+        data-item="{{item}}"
+        hover-class="card-hover"
+        hover-stay-time="100"
+      >
+        <!-- 图片容器 -->
+        <view class="image-wrapper">
+          <image src="{{item.image}}" mode="widthFix" class="recipe-img" lazy-load></image>
+          <!-- 左下角显示时间和难度 -->
+          <view class="info-tag-overlay">
+            <text>{{item.time}} · {{item.difficulty}}</text>
+          </view>
+        </view>
+        
+        <!-- 内容区 -->
+        <view class="card-content">
+          <text class="recipe-title">{{item.title}}</text>
+          
+          <!-- 作者与热度 -->
+          <view class="author-row">
+            <view class="author-left">
+              <image src="{{item.avatar}}" class="author-avatar"></image>
+              <text class="author-name">{{item.author}}</text>
+            </view>
+            <view class="like-right">
+              <text class="heart-icon">❤️</text>
+              <text class="like-count">{{item.likes}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 右列 -->
+    <view class="column">
+      <view 
+        class="recipe-card" 
+        wx:for="{{rightList}}" 
+        wx:key="id"
+        bindtap="goToDetail"
+        data-item="{{item}}"
+        hover-class="card-hover"
+        hover-stay-time="100"
+      >
+        <view class="image-wrapper">
+          <image src="{{item.image}}" mode="widthFix" class="recipe-img" lazy-load></image>
+          <view class="info-tag-overlay">
+            <text>{{item.time}} · {{item.difficulty}}</text>
+          </view>
+        </view>
+        
+        <view class="card-content">
+          <text class="recipe-title">{{item.title}}</text>
+          
+          <view class="author-row">
+            <view class="author-left">
+              <image src="{{item.avatar}}" class="author-avatar"></image>
+              <text class="author-name">{{item.author}}</text>
+            </view>
+            <view class="like-right">
+              <text class="heart-icon">❤️</text>
+              <text class="like-count">{{item.likes}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 3. 悬浮创作按钮 (FAB) -->
+  <view class="fab-btn" hover-class="fab-hover" bindtap="createRecipe">
+    <text class="plus-icon">＋</text>
+  </view>
+
+  <!-- 底部加载更多提示 -->
+  <view class="loading-text">—— 唯有美食不可辜负 ——</view>
+
+</view>
+

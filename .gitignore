@@ -1,12 +1,4 @@
-# Node modules
-node_modules/
 
-# uni-app 编译产物
-unpackage/
-dist/
-
-# 微信开发者工具
-.DS_Store
 
 # 编辑器
 .vscode/

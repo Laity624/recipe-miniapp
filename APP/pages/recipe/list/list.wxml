@@ -1,0 +1,75 @@
+<!--pages/recipe/list/list.wxml-->
+<view class="list-page">
+  
+  <!-- Tab 切换 -->
+  <view class="tabs">
+    <view 
+      class="tab-item {{activeTab === 0 ? 'active' : ''}}" 
+      bindtap="switchTab" 
+      data-tab="0"
+    >
+      <text>全部</text>
+      <view class="tab-badge" wx:if="{{counts.all > 0}}">{{counts.all}}</view>
+    </view>
+    <view 
+      class="tab-item {{activeTab === 1 ? 'active' : ''}}" 
+      bindtap="switchTab" 
+      data-tab="1"
+    >
+      <text>已发布</text>
+      <view class="tab-badge" wx:if="{{counts.published > 0}}">{{counts.published}}</view>
+    </view>
+    <view 
+      class="tab-item {{activeTab === 2 ? 'active' : ''}}" 
+      bindtap="switchTab" 
+      data-tab="2"
+    >
+      <text>草稿</text>
+      <view class="tab-badge" wx:if="{{counts.draft > 0}}">{{counts.draft}}</view>
+    </view>
+  </view>
+
+  <!-- 列表内容 -->
+  <view class="content">
+    <view class="recipe-list" wx:if="{{list.length > 0}}">
+      <view 
+        class="recipe-item" 
+        wx:for="{{list}}" 
+        wx:key="id"
+        bindtap="goToDetail"
+        data-id="{{item.id}}"
+        hover-class="item-hover"
+      >
+        <image class="recipe-image" src="{{item.images[0]}}" mode="aspectFill"></image>
+        <view class="recipe-info">
+          <text class="recipe-name">{{item.name}}</text>
+          <text class="recipe-desc">{{item.description}}</text>
+          <view class="recipe-meta">
+            <view class="meta-item">
+              <text class="meta-icon">👁️</text>
+              <text class="meta-text">{{item.viewCount || 0}}</text>
+            </view>
+            <view class="meta-item">
+              <text class="meta-icon">❤️</text>
+              <text class="meta-text">{{item.favoriteCount || 0}}</text>
+            </view>
+            <view class="status-tag" wx:if="{{item.status === 0}}">草稿</view>
+            <view class="status-tag private" wx:if="{{item.status === 1 && item.isPublic === 0}}">私密</view>
+          </view>
+        </view>
+        <view class="action-btn" catchtap="showActionSheet" data-item="{{item}}">
+          <text class="action-icon">⋮</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:else>
+      <text class="empty-icon">📝</text>
+      <text class="empty-text">{{emptyText}}</text>
+      <view class="empty-btn" bindtap="createRecipe">创建菜谱</view>
+    </view>
+  </view>
+
+</view>
+

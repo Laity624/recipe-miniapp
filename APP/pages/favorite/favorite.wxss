@@ -1,0 +1,132 @@
+/* pages/favorite/favorite.wxss */
+
+.favorite-page {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  padding: 24rpx;
+}
+
+/* ========== 收藏列表 ========== */
+.favorite-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.favorite-item {
+  display: flex;
+  background-color: var(--card-bg);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+}
+
+.item-hover {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-base);
+}
+
+.recipe-image {
+  width: 180rpx;
+  height: 180rpx;
+  flex-shrink: 0;
+  background-color: var(--bg-grey);
+}
+
+.recipe-info {
+  flex: 1;
+  padding: 24rpx;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.recipe-name {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 12rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+.recipe-desc {
+  font-size: var(--font-sm);
+  color: var(--text-light);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin-bottom: 12rpx;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.author-avatar {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background-color: var(--bg-grey);
+}
+
+.author-name {
+  font-size: var(--font-sm);
+  color: var(--text-sub);
+}
+
+.favorite-time {
+  margin-left: auto;
+  font-size: var(--font-xs);
+  color: var(--text-light);
+}
+
+.action-btn {
+  width: 80rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-color);
+}
+
+.heart-icon {
+  font-size: 48rpx;
+}
+
+/* ========== 空状态 ========== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 200rpx 0;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 24rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: var(--font-base);
+  color: var(--text-light);
+  margin-bottom: 40rpx;
+}
+
+.empty-btn {
+  padding: 20rpx 48rpx;
+  background: linear-gradient(135deg, #FF9F7F, #FF8E66);
+  color: #ffffff;
+  font-size: var(--font-base);
+  border-radius: var(--radius-capsule);
+  box-shadow: var(--shadow-diffuse);
+}
+

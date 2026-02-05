@@ -1,0 +1,38 @@
+<!--pages/favorite/favorite.wxml-->
+<view class="favorite-page">
+  
+  <!-- 收藏列表 -->
+  <view class="favorite-list" wx:if="{{list.length > 0}}">
+    <view 
+      class="favorite-item" 
+      wx:for="{{list}}" 
+      wx:key="id"
+      bindtap="goToDetail"
+      data-id="{{item.recipeId}}"
+      hover-class="item-hover"
+    >
+      <image class="recipe-image" src="{{item.recipeImage}}" mode="aspectFill"></image>
+      <view class="recipe-info">
+        <text class="recipe-name">{{item.recipeName}}</text>
+        <text class="recipe-desc">{{item.recipeDesc}}</text>
+        <view class="author-info">
+          <image class="author-avatar" src="{{item.authorAvatar}}" mode="aspectFill"></image>
+          <text class="author-name">{{item.authorName}}</text>
+          <text class="favorite-time">{{item.createTime}}</text>
+        </view>
+      </view>
+      <view class="action-btn" catchtap="cancelFavorite" data-id="{{item.id}}">
+        <text class="heart-icon">❤️</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:else>
+    <text class="empty-icon">⭐</text>
+    <text class="empty-text">还没有收藏任何菜谱</text>
+    <view class="empty-btn" bindtap="goToIndex">去发现</view>
+  </view>
+
+</view>
+

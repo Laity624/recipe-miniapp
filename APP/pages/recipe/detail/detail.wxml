@@ -1,0 +1,141 @@
+<!--pages/recipe/detail/detail.wxml-->
+<view class="detail-page">
+  
+  <!-- 图片轮播 -->
+  <swiper class="image-swiper" indicator-dots indicator-color="rgba(255,255,255,0.5)" indicator-active-color="#FF9F7F">
+    <swiper-item wx:for="{{recipe.images}}" wx:key="index">
+      <image src="{{item}}" mode="aspectFill" class="swiper-image" bindtap="previewImage" data-url="{{item}}"></image>
+    </swiper-item>
+  </swiper>
+
+  <!-- 基本信息 -->
+  <view class="info-card">
+    <view class="title-row">
+      <text class="recipe-title">{{recipe.name}}</text>
+      <view class="favorite-btn" bindtap="toggleFavorite">
+        <text class="heart-icon">{{isFavorite ? '❤️' : '🤍'}}</text>
+      </view>
+    </view>
+    
+    <text class="description">{{recipe.description}}</text>
+    
+    <!-- 标签信息 -->
+    <view class="tags-row">
+      <view class="tag-item">
+        <text class="tag-label">分类</text>
+        <text class="tag-value">{{recipe.categoryText}}</text>
+      </view>
+      <view class="tag-item">
+        <text class="tag-label">口味</text>
+        <text class="tag-value">{{recipe.tasteText}}</text>
+      </view>
+      <view class="tag-item">
+        <text class="tag-label">难度</text>
+        <text class="tag-value">{{recipe.difficultyText}}</text>
+      </view>
+      <view class="tag-item">
+        <text class="tag-label">时长</text>
+        <text class="tag-value">{{recipe.cookingTimeText}}</text>
+      </view>
+    </view>
+
+    <!-- 作者信息 -->
+    <view class="author-info">
+      <image class="author-avatar" src="{{recipe.authorAvatar}}" mode="aspectFill"></image>
+      <text class="author-name">{{recipe.authorName}}</text>
+      <text class="publish-time">{{recipe.createTime}}</text>
+    </view>
+  </view>
+
+  <!-- 食材 -->
+  <view class="section-card" wx:if="{{recipe.ingredients && recipe.ingredients.length > 0}}">
+    <view class="section-title">
+      <text class="title-icon">🥬</text>
+      <text class="title-text">食材</text>
+    </view>
+    <view class="ingredient-list">
+      <view class="ingredient-item" wx:for="{{recipe.ingredients}}" wx:key="index">
+        <text class="ingredient-name">{{item.name}}</text>
+        <text class="ingredient-amount">{{item.amount}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 调料 -->
+  <view class="section-card" wx:if="{{recipe.seasonings && recipe.seasonings.length > 0}}">
+    <view class="section-title">
+      <text class="title-icon">🧂</text>
+      <text class="title-text">调料</text>
+    </view>
+    <view class="ingredient-list">
+      <view class="ingredient-item" wx:for="{{recipe.seasonings}}" wx:key="index">
+        <text class="ingredient-name">{{item.name}}</text>
+        <text class="ingredient-amount">{{item.amount}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 步骤 -->
+  <view class="section-card" wx:if="{{recipe.steps && recipe.steps.length > 0}}">
+    <view class="section-title">
+      <text class="title-icon">📝</text>
+      <text class="title-text">步骤</text>
+    </view>
+    <view class="steps-list">
+      <view class="step-item" wx:for="{{recipe.steps}}" wx:key="order">
+        <view class="step-number">{{item.order}}</view>
+        <view class="step-content">
+          <text class="step-text">{{item.content}}</text>
+          <image wx:if="{{item.image}}" class="step-image" src="{{item.image}}" mode="widthFix" bindtap="previewImage" data-url="{{item.image}}"></image>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 小技巧 -->
+  <view class="section-card" wx:if="{{recipe.tips}}">
+    <view class="section-title">
+      <text class="title-icon">💡</text>
+      <text class="title-text">小技巧</text>
+    </view>
+    <text class="tips-text">{{recipe.tips}}</text>
+  </view>
+
+  <!-- 注意事项 -->
+  <view class="section-card" wx:if="{{recipe.notes}}">
+    <view class="section-title">
+      <text class="title-icon">⚠️</text>
+      <text class="title-text">注意事项</text>
+    </view>
+    <text class="tips-text">{{recipe.notes}}</text>
+  </view>
+
+  <!-- 外部链接 -->
+  <view class="section-card" wx:if="{{recipe.links && recipe.links.length > 0}}">
+    <view class="section-title">
+      <text class="title-icon">🔗</text>
+      <text class="title-text">相关链接</text>
+    </view>
+    <view class="links-list">
+      <text class="link-item" wx:for="{{recipe.links}}" wx:key="index" bindtap="copyLink" data-link="{{item}}">{{item}}</text>
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar" wx:if="{{isOwner}}">
+    <view class="bar-btn" bindtap="editRecipe">
+      <text class="btn-icon">✏️</text>
+      <text class="btn-text">编辑</text>
+    </view>
+    <view class="bar-btn" bindtap="deleteRecipe">
+      <text class="btn-icon">🗑️</text>
+      <text class="btn-text">删除</text>
+    </view>
+    <view class="bar-btn" bindtap="shareRecipe">
+      <text class="btn-icon">📤</text>
+      <text class="btn-text">分享</text>
+    </view>
+  </view>
+
+</view>
+

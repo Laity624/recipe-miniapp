@@ -1,0 +1,5 @@
+/* pages/recipes/recipes.wxss */
+.container {
+  padding: var(--spacing-md);
+}
+

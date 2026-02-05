@@ -1,0 +1,163 @@
+/* pages/mine/mine.wxss */
+
+.mine-page {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  padding-bottom: 40rpx;
+}
+
+/* ========== 个人信息卡片 ========== */
+.header-card {
+  background-color: var(--card-bg);
+  margin: 24rpx;
+  padding: 40rpx 32rpx;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background-color: var(--bg-grey);
+  margin-right: 24rpx;
+}
+
+.info {
+  flex: 1;
+}
+
+.nickname {
+  display: block;
+  font-size: var(--font-xl);
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 12rpx;
+}
+
+.identity-code-box {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-grey);
+  padding: 8rpx 16rpx;
+  border-radius: var(--radius-sm);
+  width: fit-content;
+}
+
+.identity-label {
+  font-size: var(--font-xs);
+  color: var(--text-light);
+  margin-right: 8rpx;
+}
+
+.identity-code {
+  font-size: var(--font-sm);
+  color: var(--text-main);
+  font-weight: 600;
+  letter-spacing: 2rpx;
+}
+
+.bio {
+  font-size: var(--font-sm);
+  color: var(--text-sub);
+  line-height: 1.6;
+  margin-bottom: 32rpx;
+}
+
+/* 统计数据 */
+.stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding-top: 24rpx;
+  border-top: 1rpx solid var(--bg-grey);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.stat-value {
+  font-size: var(--font-xl);
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.stat-label {
+  font-size: var(--font-xs);
+  color: var(--text-light);
+}
+
+.stat-divider {
+  width: 1rpx;
+  height: 60rpx;
+  background-color: var(--bg-grey);
+}
+
+/* ========== 功能菜单 ========== */
+.menu-section {
+  background-color: var(--card-bg);
+  margin: 24rpx;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 32rpx;
+  border-bottom: 1rpx solid var(--bg-grey);
+  transition: background-color 0.2s;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-hover {
+  background-color: var(--bg-grey);
+}
+
+.menu-left {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.menu-icon {
+  font-size: 40rpx;
+}
+
+.menu-title {
+  font-size: var(--font-base);
+  color: var(--text-main);
+}
+
+.menu-arrow {
+  font-size: 48rpx;
+  color: var(--text-placeholder);
+  font-weight: 300;
+}
+
+/* ========== 底部 ========== */
+.footer {
+  text-align: center;
+  padding: 60rpx 0 40rpx;
+}
+
+.version {
+  font-size: var(--font-xs);
+  color: var(--text-placeholder);
+}
+

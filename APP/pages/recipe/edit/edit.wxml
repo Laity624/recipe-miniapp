@@ -1,0 +1,165 @@
+<!--pages/recipe/edit/edit.wxml-->
+<view class="edit-page">
+  
+  <form bindsubmit="onSubmit">
+    
+    <!-- 基本信息 -->
+    <view class="form-section">
+      <view class="section-title">基本信息</view>
+      
+      <view class="form-item">
+        <text class="label">菜名 *</text>
+        <input class="input" name="name" value="{{formData.name}}" placeholder="请输入菜名" maxlength="50" />
+      </view>
+      
+      <view class="form-item">
+        <text class="label">描述</text>
+        <textarea class="textarea" name="description" value="{{formData.description}}" placeholder="简单描述一下这道菜..." maxlength="200" />
+      </view>
+      
+      <!-- 图片上传 -->
+      <view class="form-item">
+        <text class="label">菜谱图片（最多5张）</text>
+        <view class="image-upload-list">
+          <view class="image-item" wx:for="{{formData.images}}" wx:key="index">
+            <image class="preview-image" src="{{item}}" mode="aspectFill"></image>
+            <view class="delete-btn" bindtap="deleteImage" data-index="{{index}}">×</view>
+          </view>
+          <view class="upload-btn" wx:if="{{formData.images.length < 5}}" bindtap="chooseImage">
+            <text class="upload-icon">+</text>
+            <text class="upload-text">添加图片</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 分类信息 -->
+    <view class="form-section">
+      <view class="section-title">分类信息</view>
+      
+      <view class="form-item">
+        <text class="label">分类</text>
+        <picker mode="selector" range="{{categories}}" range-key="label" value="{{formData.category}}" bindchange="onCategoryChange">
+          <view class="picker">{{categories[formData.category].label || '请选择'}}</view>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="label">口味</text>
+        <picker mode="selector" range="{{tastes}}" range-key="label" value="{{formData.taste}}" bindchange="onTasteChange">
+          <view class="picker">{{tastes[formData.taste].label || '请选择'}}</view>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="label">烹饪方式</text>
+        <picker mode="selector" range="{{cookingMethods}}" range-key="label" value="{{formData.cookingMethod}}" bindchange="onCookingMethodChange">
+          <view class="picker">{{cookingMethods[formData.cookingMethod].label || '请选择'}}</view>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="label">烹饪时间</text>
+        <picker mode="selector" range="{{cookingTimes}}" range-key="label" value="{{formData.cookingTime}}" bindchange="onCookingTimeChange">
+          <view class="picker">{{cookingTimes[formData.cookingTime].label || '请选择'}}</view>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="label">难度</text>
+        <picker mode="selector" range="{{difficulties}}" range-key="label" value="{{formData.difficulty}}" bindchange="onDifficultyChange">
+          <view class="picker">{{difficulties[formData.difficulty].label || '请选择'}}</view>
+        </picker>
+      </view>
+      
+      <view class="form-item">
+        <text class="label">人数</text>
+        <picker mode="selector" range="{{servings}}" range-key="label" value="{{formData.servings}}" bindchange="onServingsChange">
+          <view class="picker">{{servings[formData.servings].label || '请选择'}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 食材 -->
+    <view class="form-section">
+      <view class="section-title-row">
+        <text class="section-title">食材</text>
+        <view class="add-btn-small" bindtap="addIngredient">+ 添加</view>
+      </view>
+      
+      <view class="ingredient-list">
+        <view class="ingredient-item" wx:for="{{formData.ingredients}}" wx:key="index">
+          <input class="ingredient-name" placeholder="食材名" value="{{item.name}}" data-index="{{index}}" bindinput="onIngredientNameInput" />
+          <input class="ingredient-amount" placeholder="用量" value="{{item.amount}}" data-index="{{index}}" bindinput="onIngredientAmountInput" />
+          <view class="delete-icon" bindtap="deleteIngredient" data-index="{{index}}">×</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 调料 -->
+    <view class="form-section">
+      <view class="section-title-row">
+        <text class="section-title">调料</text>
+        <view class="add-btn-small" bindtap="addSeasoning">+ 添加</view>
+      </view>
+      
+      <view class="ingredient-list">
+        <view class="ingredient-item" wx:for="{{formData.seasonings}}" wx:key="index">
+          <input class="ingredient-name" placeholder="调料名" value="{{item.name}}" data-index="{{index}}" bindinput="onSeasoningNameInput" />
+          <input class="ingredient-amount" placeholder="用量" value="{{item.amount}}" data-index="{{index}}" bindinput="onSeasoningAmountInput" />
+          <view class="delete-icon" bindtap="deleteSeasoning" data-index="{{index}}">×</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 步骤 -->
+    <view class="form-section">
+      <view class="section-title-row">
+        <text class="section-title">步骤</text>
+        <view class="add-btn-small" bindtap="addStep">+ 添加</view>
+      </view>
+      
+      <view class="steps-list">
+        <view class="step-item" wx:for="{{formData.steps}}" wx:key="order">
+          <view class="step-number">{{item.order}}</view>
+          <view class="step-content">
+            <textarea class="step-textarea" placeholder="描述步骤..." value="{{item.content}}" data-index="{{index}}" bindinput="onStepContentInput" />
+            <view class="step-image-upload" wx:if="{{!item.image}}" bindtap="chooseStepImage" data-index="{{index}}">
+              <text class="upload-icon-small">+</text>
+              <text class="upload-text-small">添加图片</text>
+            </view>
+            <view class="step-image-preview" wx:else>
+              <image class="step-image" src="{{item.image}}" mode="widthFix"></image>
+              <view class="delete-step-image" bindtap="deleteStepImage" data-index="{{index}}">×</view>
+            </view>
+          </view>
+          <view class="delete-icon" bindtap="deleteStep" data-index="{{index}}">×</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 其他信息 -->
+    <view class="form-section">
+      <view class="section-title">其他信息</view>
+      
+      <view class="form-item">
+        <text class="label">小技巧</text>
+        <textarea class="textarea" name="tips" value="{{formData.tips}}" placeholder="分享一些烹饪小技巧..." maxlength="500" />
+      </view>
+      
+      <view class="form-item">
+        <text class="label">注意事项</text>
+        <textarea class="textarea" name="notes" value="{{formData.notes}}" placeholder="需要注意的事项..." maxlength="500" />
+      </view>
+    </view>
+
+    <!-- 底部按钮 -->
+    <view class="bottom-buttons">
+      <button class="btn-secondary" bindtap="saveDraft">保存草稿</button>
+      <button class="btn-primary" form-type="submit">发布</button>
+    </view>
+    
+  </form>
+
+</view>
+

@@ -1,0 +1,286 @@
+/* pages/friend/list/list.wxss */
+
+.friend-list-page {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  padding-bottom: 120rpx;
+}
+
+/* ========== Tab 切换 ========== */
+.tabs {
+  display: flex;
+  background-color: var(--card-bg);
+  padding: 0 24rpx;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.tab-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  padding: 32rpx 0;
+  font-size: var(--font-base);
+  color: var(--text-sub);
+  position: relative;
+  transition: all 0.3s;
+}
+
+.tab-item.active {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60rpx;
+  height: 6rpx;
+  background: linear-gradient(135deg, #FF9F7F, #FF8E66);
+  border-radius: 3rpx;
+}
+
+.tab-badge {
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 8rpx;
+  background-color: var(--color-error);
+  color: #ffffff;
+  font-size: var(--font-xxs);
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ========== 内容区 ========== */
+.content {
+  padding: 24rpx;
+}
+
+/* ========== 好友列表 ========== */
+.friend-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.friend-item {
+  display: flex;
+  align-items: center;
+  background-color: var(--card-bg);
+  padding: 24rpx;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+}
+
+.item-hover {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-base);
+}
+
+.friend-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background-color: var(--bg-grey);
+  margin-right: 24rpx;
+}
+
+.friend-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.friend-name {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.friend-bio {
+  font-size: var(--font-sm);
+  color: var(--text-light);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+.friend-stats {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.stat-text {
+  font-size: var(--font-xs);
+  color: var(--text-light);
+}
+
+.stat-divider {
+  color: var(--text-placeholder);
+}
+
+.action-btn {
+  width: 60rpx;
+  height: 60rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-icon {
+  font-size: 48rpx;
+  color: var(--text-light);
+  font-weight: 300;
+}
+
+/* ========== 好友申请列表 ========== */
+.request-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.request-item {
+  display: flex;
+  align-items: center;
+  background-color: var(--card-bg);
+  padding: 24rpx;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.request-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background-color: var(--bg-grey);
+  margin-right: 24rpx;
+}
+
+.request-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.request-name {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.request-time {
+  font-size: var(--font-xs);
+  color: var(--text-light);
+}
+
+.request-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.btn-reject,
+.btn-accept {
+  padding: 12rpx 32rpx;
+  border-radius: var(--radius-capsule);
+  font-size: var(--font-sm);
+}
+
+.btn-reject {
+  background-color: var(--bg-grey);
+  color: var(--text-sub);
+}
+
+.btn-accept {
+  background: linear-gradient(135deg, #FF9F7F, #FF8E66);
+  color: #ffffff;
+}
+
+.request-status {
+  padding: 12rpx 32rpx;
+}
+
+.status-text {
+  font-size: var(--font-sm);
+  color: var(--text-light);
+}
+
+.status-text.accepted {
+  color: var(--color-success);
+}
+
+.status-text.rejected {
+  color: var(--text-placeholder);
+}
+
+/* ========== 空状态 ========== */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 200rpx 0;
+}
+
+.empty-icon {
+  font-size: 120rpx;
+  margin-bottom: 24rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: var(--font-base);
+  color: var(--text-light);
+  margin-bottom: 40rpx;
+}
+
+.empty-btn {
+  padding: 20rpx 48rpx;
+  background: linear-gradient(135deg, #FF9F7F, #FF8E66);
+  color: #ffffff;
+  font-size: var(--font-base);
+  border-radius: var(--radius-capsule);
+  box-shadow: var(--shadow-diffuse);
+}
+
+/* ========== 悬浮按钮 ========== */
+.fab-btn {
+  position: fixed;
+  right: 40rpx;
+  bottom: 120rpx;
+  width: 100rpx;
+  height: 100rpx;
+  background: linear-gradient(135deg, #FF9F7F, #FF8E66);
+  border-radius: 50%;
+  box-shadow: var(--shadow-diffuse);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+  transition: all 0.3s ease;
+}
+
+.fab-hover {
+  transform: scale(0.9);
+}
+
+.plus-icon {
+  font-size: 48rpx;
+  color: #ffffff;
+  font-weight: 300;
+}
+

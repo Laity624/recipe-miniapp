@@ -1,0 +1,40 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/mine/mine",
+    "pages/recipe/detail/detail",
+    "pages/recipe/edit/edit",
+    "pages/recipe/list/list",
+    "pages/friend/list/list",
+    "pages/friend/search/search",
+    "pages/favorite/favorite"
+  ],
+  "window": {
+    "navigationBarTitleText": "个人菜谱",
+    "navigationBarBackgroundColor": "#FF9F7F",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#FAFAF8",
+    "backgroundTextStyle": "dark",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#FF9F7F",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "菜谱"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}
+
