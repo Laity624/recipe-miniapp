@@ -3,25 +3,16 @@ const app = getApp()
 
 Page({
   data: {
-    userInfo: {
-      nickname: '美食家',
-      avatarUrl: '',
-      identityCode: 'ABC123',
-      bio: '热爱烹饪，分享美食',
-      recipeCount: 0,
-      friendCount: 0,
-      favoriteCount: 0,
-      isAdmin: true  // 测试用，设置为管理员
-    }
+    userInfo: null
   },
 
   onLoad(options) {
-    // this.loadUserInfo()
+    this.loadUserInfo();
   },
 
   onShow() {
     // 每次显示时刷新用户信息
-    // this.loadUserInfo()
+    this.loadUserInfo();
 
     // 更新自定义 tab 栏选中状态
     if (typeof this.getTabBar === 'function' && this.getTabBar()) {
@@ -34,34 +25,25 @@ Page({
   // 加载用户信息
   loadUserInfo() {
     // 从全局数据或缓存中获取用户信息
-    const userInfo = app.globalData.userInfo || wx.getStorageSync('userInfo')
-    
-    if (userInfo) {
+    const userInfo = app.globalData.userInfo || wx.getStorageSync('userInfo');
+
+    if (userInfo && userInfo._openid) {
       this.setData({
         userInfo
-      })
+      });
+
+      // 同步到全局数据
+      app.globalData.userInfo = userInfo;
     } else {
       // 未登录，引导登录
-      this.showLoginTip()
+      this.showLoginTip();
     }
-
-    // TODO: 调用云函数获取最新的用户统计数据
-    this.getUserStats()
   },
 
   // 获取用户统计数据
   getUserStats() {
-    // TODO: 调用云函数
-    // wx.cloud.callFunction({
-    //   name: 'getUserStats',
-    //   success: res => {
-    //     this.setData({
-    //       'userInfo.recipeCount': res.result.recipeCount,
-    //       'userInfo.friendCount': res.result.friendCount,
-    //       'userInfo.favoriteCount': res.result.favoriteCount
-    //     })
-    //   }
-    // })
+    // 统计数据已经在用户信息中，暂时不需要单独获取
+    // 后续如果需要实时更新统计数据，可以在这里调用云函数
   },
 
   // 页面跳转

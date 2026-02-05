@@ -27,7 +27,7 @@ Page({
    */
   async handleLogin() {
     try {
-      // 调用微信授权获取用户信息
+      // 1. 调用微信授权获取用户信息
       const { userInfo } = await wx.getUserProfile({
         desc: '用于完善用户资料'
       });
@@ -40,22 +40,38 @@ Page({
         mask: true
       });
 
-      // 模拟登录延迟
-      await this.simulateLogin(userInfo);
+      // 2. 调用云函数进行登录
+      const result = await wx.cloud.callFunction({
+        name: 'user',
+        data: {
+          action: 'login',
+          nickName: userInfo.nickName,
+          avatarUrl: userInfo.avatarUrl
+        }
+      });
 
-      // 保存用户信息到本地
-      wx.setStorageSync('userInfo', userInfo);
+      console.log('云函数返回:', result);
+
+      // 3. 检查登录结果
+      if (!result.result.success) {
+        throw new Error(result.result.errorMessage || '登录失败');
+      }
+
+      // 4. 保存完整的用户信息到本地
+      const userData = result.result.data.user;
+      wx.setStorageSync('userInfo', userData);
 
       wx.hideLoading();
 
-      // 显示成功提示
+      // 5. 根据是否首次登录显示不同提示
+      const isFirstLogin = result.result.data.isFirstLogin;
       wx.showToast({
-        title: '登录成功',
+        title: isFirstLogin ? '欢迎加入！' : '欢迎回来！',
         icon: 'success',
         duration: 1500
       });
 
-      // 延迟跳转到首页
+      // 6. 延迟跳转到首页
       setTimeout(() => {
         wx.switchTab({
           url: '/pages/index/index'
@@ -76,28 +92,12 @@ Page({
         });
       } else {
         wx.showToast({
-          title: '登录失败，请重试',
+          title: error.message || '登录失败，请重试',
           icon: 'none',
           duration: 2000
         });
       }
     }
-  },
-
-  /**
-   * 模拟登录过程（后续替换为真实的云函数调用）
-   */
-  simulateLogin(userInfo) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // TODO: 这里后续需要调用云函数
-        // 1. 调用 wx.login() 获取 code
-        // 2. 调用云函数换取 openid
-        // 3. 创建或更新用户信息
-        // 4. 生成身份码
-        resolve();
-      }, 1000);
-    });
   }
 });
 
