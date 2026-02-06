@@ -57,12 +57,14 @@
 
 <!-- 新增/编辑弹窗 -->
 <van-dialog
-  id="van-dialog"
   show="{{showDialog}}"
   title="{{dialogTitle}}"
   show-cancel-button
+  confirm-button-text="确定"
+  cancel-button-text="取消"
   bind:confirm="handleDialogConfirm"
   bind:cancel="handleDialogCancel"
+  use-slot
 >
   <view class="dialog-content">
     <view class="form-item">

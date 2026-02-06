@@ -19,6 +19,10 @@ yarn-error.log*
 .env.local
 .env.*.local
 
+# 微信小程序私有配置（包含 appid 等敏感信息）
+APP/project.private.config.json
+APP/config.js
+
 # 临时文件
 *.tmp
 *.temp

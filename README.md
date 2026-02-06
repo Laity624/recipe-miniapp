@@ -49,7 +49,38 @@ recipe-miniapp/
 
 ### 安装步骤
 
-（待补充）
+1. **克隆项目**
+   ```bash
+   git clone <repository-url>
+   cd recipe-manage
+   ```
+
+2. **配置敏感信息**
+   ```bash
+   # 复制配置模板
+   cd APP
+   cp config.example.js config.js
+   cp project.private.config.json.example project.private.config.json
+   ```
+
+3. **填写配置信息**
+   - 在 `APP/config.js` 中填入你的云环境 ID
+   - 在 `APP/project.private.config.json` 中填入你的 appid
+
+4. **安装依赖**
+   ```bash
+   npm install
+   ```
+
+5. **使用微信开发者工具打开 APP 目录**
+
+### 安全说明
+
+本项目已将敏感信息（appid、云环境 ID）从代码仓库中排除：
+- `APP/project.private.config.json` - 包含 appid
+- `APP/config.js` - 包含云环境 ID
+
+这些文件不会被提交到 Git 仓库，请根据模板文件自行配置。
 
 ## 许可证
 

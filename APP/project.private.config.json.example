@@ -1,6 +1,8 @@
 {
-  "libVersion": "2.33.0",
+  "description": "私有配置文件模板 - 请复制为 project.private.config.json 并填入真实信息",
+  "libVersion": "3.14.1",
   "projectname": "recipe-manage",
+  "appid": "your-appid-here",
   "condition": {},
   "setting": {
     "urlCheck": true,

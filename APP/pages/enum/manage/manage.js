@@ -35,39 +35,49 @@ Page({
   /**
    * 加载枚举值列表
    */
-  loadEnumList() {
-    // 模拟数据，后续替换为云函数调用
-    const mockData = this.getMockData(this.data.type);
-    this.setData({
-      enumList: mockData
-    });
-  },
+  async loadEnumList() {
+    try {
+      wx.showLoading({ title: '加载中...', mask: true });
 
-  /**
-   * 获取模拟数据
-   */
-  getMockData(type) {
-    const dataMap = {
-      category: [
-        { type: 'category', value: 0, label: '家常菜', sort: 0, isActive: true },
-        { type: 'category', value: 1, label: '川菜', sort: 1, isActive: true },
-        { type: 'category', value: 2, label: '粤菜', sort: 2, isActive: true },
-        { type: 'category', value: 3, label: '湘菜', sort: 3, isActive: true },
-        { type: 'category', value: 4, label: '鲁菜', sort: 4, isActive: false }
-      ],
-      taste: [
-        { type: 'taste', value: 0, label: '清淡', sort: 0, isActive: true },
-        { type: 'taste', value: 1, label: '微辣', sort: 1, isActive: true },
-        { type: 'taste', value: 2, label: '中辣', sort: 2, isActive: true }
-      ]
-    };
-    return dataMap[type] || [];
+      // 调用云函数获取枚举值
+      const result = await wx.cloud.callFunction({
+        name: 'enum',
+        data: {
+          action: 'getEnums',
+          type: this.data.type
+        }
+      });
+
+      wx.hideLoading();
+
+      if (!result.result.success) {
+        throw new Error(result.result.errorMessage || '加载失败');
+      }
+
+      this.setData({
+        enumList: result.result.data.enums
+      });
+
+    } catch (error) {
+      console.error('加载枚举值失败:', error);
+      wx.hideLoading();
+      wx.showToast({
+        title: error.message || '加载失败',
+        icon: 'none'
+      });
+    }
   },
 
   /**
    * 显示新增弹窗
    */
   showAddDialog() {
+    console.log('[showAddDialog] 方法被调用');
+    console.log('[showAddDialog] 当前 enumList:', this.data.enumList);
+
+    const nextValue = this.getNextValue();
+    console.log('[showAddDialog] 下一个枚举值:', nextValue);
+
     this.setData({
       showDialog: true,
       dialogTitle: '新增枚举值',
@@ -75,8 +85,10 @@ Page({
       currentIndex: -1,
       formData: {
         label: '',
-        value: this.getNextValue()
+        value: nextValue
       }
+    }, () => {
+      console.log('[showAddDialog] setData 完成, showDialog:', this.data.showDialog);
     });
   },
 
@@ -170,47 +182,95 @@ Page({
   /**
    * 新增枚举值
    */
-  addEnum() {
-    const newItem = {
-      type: this.data.type,
-      value: parseInt(this.data.formData.value),
-      label: this.data.formData.label.trim(),
-      sort: this.data.enumList.length,
-      isActive: true
-    };
+  async addEnum() {
+    try {
+      wx.showLoading({ title: '保存中...', mask: true });
 
-    const enumList = [...this.data.enumList, newItem];
-    this.setData({
-      enumList,
-      showDialog: false
-    });
+      // 调用云函数新增枚举值
+      const result = await wx.cloud.callFunction({
+        name: 'enum',
+        data: {
+          action: 'addEnum',
+          type: this.data.type,
+          value: parseInt(this.data.formData.value),
+          label: this.data.formData.label.trim(),
+          sort: this.data.enumList.length
+        }
+      });
 
-    wx.showToast({
-      title: '新增成功',
-      icon: 'success'
-    });
+      wx.hideLoading();
 
-    // TODO: 调用云函数保存到数据库
+      if (!result.result.success) {
+        throw new Error(result.result.errorMessage || '新增失败');
+      }
+
+      this.setData({
+        showDialog: false
+      });
+
+      wx.showToast({
+        title: '新增成功',
+        icon: 'success'
+      });
+
+      // 重新加载列表
+      this.loadEnumList();
+
+    } catch (error) {
+      console.error('新增枚举值失败:', error);
+      wx.hideLoading();
+      wx.showToast({
+        title: error.message || '新增失败',
+        icon: 'none'
+      });
+    }
   },
 
   /**
    * 更新枚举值
    */
-  updateEnum() {
-    const enumList = [...this.data.enumList];
-    enumList[this.data.currentIndex].label = this.data.formData.label.trim();
+  async updateEnum() {
+    try {
+      wx.showLoading({ title: '保存中...', mask: true });
 
-    this.setData({
-      enumList,
-      showDialog: false
-    });
+      const item = this.data.enumList[this.data.currentIndex];
 
-    wx.showToast({
-      title: '更新成功',
-      icon: 'success'
-    });
+      // 调用云函数更新枚举值
+      const result = await wx.cloud.callFunction({
+        name: 'enum',
+        data: {
+          action: 'updateEnum',
+          enumId: item._id,
+          label: this.data.formData.label.trim()
+        }
+      });
 
-    // TODO: 调用云函数更新数据库
+      wx.hideLoading();
+
+      if (!result.result.success) {
+        throw new Error(result.result.errorMessage || '更新失败');
+      }
+
+      this.setData({
+        showDialog: false
+      });
+
+      wx.showToast({
+        title: '更新成功',
+        icon: 'success'
+      });
+
+      // 重新加载列表
+      this.loadEnumList();
+
+    } catch (error) {
+      console.error('更新枚举值失败:', error);
+      wx.hideLoading();
+      wx.showToast({
+        title: error.message || '更新失败',
+        icon: 'none'
+      });
+    }
   },
 
   /**
@@ -225,21 +285,47 @@ Page({
   /**
    * 切换启用状态
    */
-  toggleActive(e) {
+  async toggleActive(e) {
     const { index } = e.currentTarget.dataset;
-    const enumList = [...this.data.enumList];
-    enumList[index].isActive = !enumList[index].isActive;
+    const item = this.data.enumList[index];
+    const newStatus = !item.isActive;
 
-    this.setData({
-      enumList
-    });
+    try {
+      wx.showLoading({ title: '处理中...', mask: true });
 
-    wx.showToast({
-      title: enumList[index].isActive ? '已启用' : '已禁用',
-      icon: 'success'
-    });
+      // 如果是禁用，调用删除接口（软删除）
+      if (!newStatus) {
+        const result = await wx.cloud.callFunction({
+          name: 'enum',
+          data: {
+            action: 'deleteEnum',
+            enumId: item._id
+          }
+        });
 
-    // TODO: 调用云函数更新数据库
+        if (!result.result.success) {
+          throw new Error(result.result.errorMessage || '操作失败');
+        }
+      }
+
+      wx.hideLoading();
+
+      wx.showToast({
+        title: newStatus ? '已启用' : '已禁用',
+        icon: 'success'
+      });
+
+      // 重新加载列表
+      this.loadEnumList();
+
+    } catch (error) {
+      console.error('切换状态失败:', error);
+      wx.hideLoading();
+      wx.showToast({
+        title: error.message || '操作失败',
+        icon: 'none'
+      });
+    }
   },
 
   /**
@@ -292,7 +378,7 @@ Page({
   /**
    * 上移
    */
-  moveUp(index) {
+  async moveUp(index) {
     if (index === 0) {
       wx.showToast({
         title: '已经是第一个了',
@@ -301,30 +387,56 @@ Page({
       return;
     }
 
-    const enumList = [...this.data.enumList];
-    [enumList[index], enumList[index - 1]] = [enumList[index - 1], enumList[index]];
+    try {
+      wx.showLoading({ title: '处理中...', mask: true });
 
-    // 更新 sort 值
-    enumList.forEach((item, i) => {
-      item.sort = i;
-    });
+      const currentItem = this.data.enumList[index];
+      const prevItem = this.data.enumList[index - 1];
 
-    this.setData({
-      enumList
-    });
+      // 交换 sort 值
+      await Promise.all([
+        wx.cloud.callFunction({
+          name: 'enum',
+          data: {
+            action: 'updateEnum',
+            enumId: currentItem._id,
+            sort: prevItem.sort
+          }
+        }),
+        wx.cloud.callFunction({
+          name: 'enum',
+          data: {
+            action: 'updateEnum',
+            enumId: prevItem._id,
+            sort: currentItem.sort
+          }
+        })
+      ]);
 
-    wx.showToast({
-      title: '上移成功',
-      icon: 'success'
-    });
+      wx.hideLoading();
 
-    // TODO: 调用云函数更新排序
+      wx.showToast({
+        title: '上移成功',
+        icon: 'success'
+      });
+
+      // 重新加载列表
+      this.loadEnumList();
+
+    } catch (error) {
+      console.error('上移失败:', error);
+      wx.hideLoading();
+      wx.showToast({
+        title: '上移失败',
+        icon: 'none'
+      });
+    }
   },
 
   /**
    * 下移
    */
-  moveDown(index) {
+  async moveDown(index) {
     if (index === this.data.enumList.length - 1) {
       wx.showToast({
         title: '已经是最后一个了',
@@ -333,24 +445,50 @@ Page({
       return;
     }
 
-    const enumList = [...this.data.enumList];
-    [enumList[index], enumList[index + 1]] = [enumList[index + 1], enumList[index]];
+    try {
+      wx.showLoading({ title: '处理中...', mask: true });
 
-    // 更新 sort 值
-    enumList.forEach((item, i) => {
-      item.sort = i;
-    });
+      const currentItem = this.data.enumList[index];
+      const nextItem = this.data.enumList[index + 1];
 
-    this.setData({
-      enumList
-    });
+      // 交换 sort 值
+      await Promise.all([
+        wx.cloud.callFunction({
+          name: 'enum',
+          data: {
+            action: 'updateEnum',
+            enumId: currentItem._id,
+            sort: nextItem.sort
+          }
+        }),
+        wx.cloud.callFunction({
+          name: 'enum',
+          data: {
+            action: 'updateEnum',
+            enumId: nextItem._id,
+            sort: currentItem.sort
+          }
+        })
+      ]);
 
-    wx.showToast({
-      title: '下移成功',
-      icon: 'success'
-    });
+      wx.hideLoading();
 
-    // TODO: 调用云函数更新排序
+      wx.showToast({
+        title: '下移成功',
+        icon: 'success'
+      });
+
+      // 重新加载列表
+      this.loadEnumList();
+
+    } catch (error) {
+      console.error('下移失败:', error);
+      wx.hideLoading();
+      wx.showToast({
+        title: '下移失败',
+        icon: 'none'
+      });
+    }
   },
 
   /**
@@ -372,25 +510,43 @@ Page({
   /**
    * 删除枚举值
    */
-  deleteEnum(index) {
-    const enumList = [...this.data.enumList];
-    enumList.splice(index, 1);
+  async deleteEnum(index) {
+    try {
+      wx.showLoading({ title: '删除中...', mask: true });
 
-    // 更新 sort 值
-    enumList.forEach((item, i) => {
-      item.sort = i;
-    });
+      const item = this.data.enumList[index];
 
-    this.setData({
-      enumList
-    });
+      // 调用云函数删除枚举值
+      const result = await wx.cloud.callFunction({
+        name: 'enum',
+        data: {
+          action: 'deleteEnum',
+          enumId: item._id
+        }
+      });
 
-    wx.showToast({
-      title: '删除成功',
-      icon: 'success'
-    });
+      wx.hideLoading();
 
-    // TODO: 调用云函数删除数据库记录
+      if (!result.result.success) {
+        throw new Error(result.result.errorMessage || '删除失败');
+      }
+
+      wx.showToast({
+        title: '删除成功',
+        icon: 'success'
+      });
+
+      // 重新加载列表
+      this.loadEnumList();
+
+    } catch (error) {
+      console.error('删除枚举值失败:', error);
+      wx.hideLoading();
+      wx.showToast({
+        title: error.message || '删除失败',
+        icon: 'none'
+      });
+    }
   }
 });
 

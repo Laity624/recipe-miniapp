@@ -1,54 +1,72 @@
 // pages/enum/list/list.js
 Page({
   data: {
-    enumTypes: []
+    enumTypes: [],
+    loading: true
   },
 
   onLoad(options) {
+    // 页面加载时不立即加载数据，等待 onShow
+  },
+
+  onShow() {
+    // 每次页面显示时都刷新数据（包括首次加载和从其他页面返回）
     this.loadEnumTypes();
   },
 
   /**
    * 加载枚举类型列表
    */
-  loadEnumTypes() {
-    // 模拟数据，后续替换为云函数调用
-    const enumTypes = [
-      {
-        type: 'category',
-        name: '菜谱分类',
-        count: 8
-      },
-      {
-        type: 'taste',
-        name: '口味',
-        count: 6
-      },
-      {
-        type: 'cookingMethod',
-        name: '烹饪方式',
-        count: 10
-      },
-      {
-        type: 'cookingTime',
-        name: '烹饪时间',
-        count: 5
-      },
-      {
-        type: 'difficulty',
-        name: '难度',
-        count: 3
-      },
-      {
-        type: 'servings',
-        name: '人数',
-        count: 6
-      }
-    ];
+  async loadEnumTypes() {
+    try {
+      wx.showLoading({ title: '加载中...', mask: true });
 
-    this.setData({
-      enumTypes
-    });
+      // 定义所有枚举类型
+      const enumTypeConfigs = [
+        { type: 'category', name: '菜谱分类' },
+        { type: 'taste', name: '口味' },
+        { type: 'cookingMethod', name: '烹饪方式' },
+        { type: 'cookingTime', name: '烹饪时间' },
+        { type: 'difficulty', name: '难度' },
+        { type: 'servings', name: '人数' }
+      ];
+
+      // 并行获取所有枚举类型的数据
+      const promises = enumTypeConfigs.map(config =>
+        wx.cloud.callFunction({
+          name: 'enum',
+          data: {
+            action: 'getEnums',
+            type: config.type
+          }
+        }).then(result => ({
+          ...config,
+          count: result.result.success ? result.result.data.enums.length : 0
+        }))
+      );
+
+      const enumTypes = await Promise.all(promises);
+
+      this.setData({
+        enumTypes,
+        loading: false
+      });
+
+      wx.hideLoading();
+
+    } catch (error) {
+      console.error('加载枚举类型失败:', error);
+      wx.hideLoading();
+
+      this.setData({
+        loading: false
+      });
+
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none'
+      });
+    }
   },
 
   /**
