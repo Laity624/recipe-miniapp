@@ -28,7 +28,7 @@
           bindtap="selectTag"
           data-index="{{index}}"
         >
-          {{item}}
+          {{item.label}}
         </view>
       </view>
     </scroll-view>
