@@ -18,6 +18,7 @@ Page({
       steps: [],
       tips: '',
       notes: '',
+      links: [],
       isPublic: 0
     },
     // 枚举数据
@@ -39,15 +40,149 @@ Page({
   },
 
   // 加载枚举数据
-  loadEnums() {
-    // TODO: 从云数据库或缓存加载枚举
+  async loadEnums() {
+    try {
+      // 缓存过期时间：24小时（单位：毫秒）
+      const CACHE_EXPIRE_TIME = 24 * 60 * 60 * 1000
+
+      // 先尝试从缓存读取
+      const cachedData = wx.getStorageSync('enumsCache')
+      if (cachedData && cachedData.enums && cachedData.timestamp) {
+        const now = Date.now()
+        const cacheAge = now - cachedData.timestamp
+
+        // 缓存未过期，直接使用
+        if (cacheAge < CACHE_EXPIRE_TIME) {
+          this.setEnumsData(cachedData.enums)
+          return
+        }
+      }
+
+      // 缓存不存在或已过期，调用云函数获取
+      const res = await wx.cloud.callFunction({
+        name: 'enum',
+        data: {
+          action: 'getEnums'
+        }
+      })
+
+      if (res.result.success) {
+        const enums = res.result.data.enums
+
+        // 缓存到本地，带时间戳
+        wx.setStorageSync('enumsCache', {
+          enums,
+          timestamp: Date.now()
+        })
+
+        this.setEnumsData(enums)
+      } else {
+        wx.showToast({
+          title: '加载枚举失败',
+          icon: 'none'
+        })
+      }
+    } catch (err) {
+      console.error('加载枚举失败:', err)
+      wx.showToast({
+        title: '加载枚举失败',
+        icon: 'none'
+      })
+    }
+  },
+
+  // 设置枚举数据
+  setEnumsData(enums) {
+    const categories = enums.filter(e => e.type === 'category' && e.isActive)
+      .sort((a, b) => a.sort - b.sort)
+      .map(e => ({ label: e.label, value: e.value }))
+
+    const tastes = enums.filter(e => e.type === 'taste' && e.isActive)
+      .sort((a, b) => a.sort - b.sort)
+      .map(e => ({ label: e.label, value: e.value }))
+
+    const cookingMethods = enums.filter(e => e.type === 'cookingMethod' && e.isActive)
+      .sort((a, b) => a.sort - b.sort)
+      .map(e => ({ label: e.label, value: e.value }))
+
+    const cookingTimes = enums.filter(e => e.type === 'cookingTime' && e.isActive)
+      .sort((a, b) => a.sort - b.sort)
+      .map(e => ({ label: e.label, value: e.value }))
+
+    const difficulties = enums.filter(e => e.type === 'difficulty' && e.isActive)
+      .sort((a, b) => a.sort - b.sort)
+      .map(e => ({ label: e.label, value: e.value }))
+
+    const servings = enums.filter(e => e.type === 'servings' && e.isActive)
+      .sort((a, b) => a.sort - b.sort)
+      .map(e => ({ label: e.label, value: e.value }))
+
+    this.setData({
+      categories,
+      tastes,
+      cookingMethods,
+      cookingTimes,
+      difficulties,
+      servings
+    })
   },
 
   // 加载菜谱数据（编辑模式）
-  loadRecipe(recipeId) {
+  async loadRecipe(recipeId) {
     wx.showLoading({ title: '加载中...' })
-    // TODO: 调用云函数获取菜谱数据
-    wx.hideLoading()
+
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'recipe',
+        data: {
+          action: 'getRecipeDetail',
+          recipeId
+        }
+      })
+
+      wx.hideLoading()
+
+      if (res.result.success) {
+        const recipe = res.result.data.recipe
+        this.setData({
+          formData: {
+            name: recipe.name,
+            description: recipe.description,
+            images: recipe.images,
+            category: recipe.category,
+            taste: recipe.taste,
+            cookingMethod: recipe.cookingMethod,
+            cookingTime: recipe.cookingTime,
+            difficulty: recipe.difficulty,
+            servings: recipe.servings,
+            ingredients: recipe.ingredients,
+            seasonings: recipe.seasonings,
+            steps: recipe.steps,
+            tips: recipe.tips,
+            notes: recipe.notes,
+            isPublic: recipe.isPublic
+          }
+        })
+      } else {
+        wx.showToast({
+          title: res.result.errorMessage || '加载失败',
+          icon: 'none'
+        })
+        setTimeout(() => {
+          wx.navigateBack()
+        }, 1500)
+      }
+    } catch (err) {
+      wx.hideLoading()
+      console.error('加载菜谱失败:', err)
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none'
+      })
+      setTimeout(() => {
+        wx.navigateBack()
+      }, 1500)
+    }
   },
 
   // 选择图片
@@ -64,25 +199,44 @@ Page({
   },
 
   // 上传图片
-  uploadImages(tempFilePaths) {
+  async uploadImages(tempFilePaths) {
     wx.showLoading({ title: '上传中...' })
-    const uploadPromises = tempFilePaths.map(filePath => {
-      return new Promise((resolve, reject) => {
-        // TODO: 上传到云存储
-        // 模拟上传
-        setTimeout(() => {
-          resolve(filePath)
-        }, 500)
-      })
-    })
 
-    Promise.all(uploadPromises).then(urls => {
+    try {
+      const uploadPromises = tempFilePaths.map(filePath => {
+        // 生成唯一文件名
+        const timestamp = Date.now()
+        const random = Math.floor(Math.random() * 10000)
+        const ext = filePath.match(/\.\w+$/)[0]
+        const cloudPath = `recipe-images/${timestamp}-${random}${ext}`
+
+        return wx.cloud.uploadFile({
+          cloudPath,
+          filePath
+        })
+      })
+
+      const results = await Promise.all(uploadPromises)
+      const urls = results.map(res => res.fileID)
+
       const images = [...this.data.formData.images, ...urls]
       this.setData({
         'formData.images': images
       })
+
       wx.hideLoading()
-    })
+      wx.showToast({
+        title: '上传成功',
+        icon: 'success'
+      })
+    } catch (err) {
+      wx.hideLoading()
+      console.error('上传图片失败:', err)
+      wx.showToast({
+        title: '上传失败',
+        icon: 'none'
+      })
+    }
   },
 
   // 删除图片
@@ -93,6 +247,28 @@ Page({
     this.setData({
       'formData.images': images
     })
+  },
+
+  // 基本信息输入
+  onNameInput(e) {
+    this.setData({ 'formData.name': e.detail.value })
+  },
+
+  onDescriptionInput(e) {
+    this.setData({ 'formData.description': e.detail.value })
+  },
+
+  onTipsInput(e) {
+    this.setData({ 'formData.tips': e.detail.value })
+  },
+
+  onNotesInput(e) {
+    this.setData({ 'formData.notes': e.detail.value })
+  },
+
+  // 是否公开切换
+  onPublicChange(e) {
+    this.setData({ 'formData.isPublic': e.detail.value ? 1 : 0 })
   },
 
   // Picker 变化事件
@@ -117,15 +293,14 @@ Page({
 
   // 添加食材
   addIngredient() {
-    const ingredients = this.data.formData.ingredients
-    ingredients.push({ name: '', amount: '' })
+    const ingredients = [...this.data.formData.ingredients, { name: '', amount: '' }]
     this.setData({ 'formData.ingredients': ingredients })
   },
 
   // 删除食材
   deleteIngredient(e) {
     const index = e.currentTarget.dataset.index
-    const ingredients = this.data.formData.ingredients
+    const ingredients = [...this.data.formData.ingredients]
     ingredients.splice(index, 1)
     this.setData({ 'formData.ingredients': ingredients })
   },
@@ -149,15 +324,14 @@ Page({
 
   // 添加调料
   addSeasoning() {
-    const seasonings = this.data.formData.seasonings
-    seasonings.push({ name: '', amount: '' })
+    const seasonings = [...this.data.formData.seasonings, { name: '', amount: '' }]
     this.setData({ 'formData.seasonings': seasonings })
   },
 
   // 删除调料
   deleteSeasoning(e) {
     const index = e.currentTarget.dataset.index
-    const seasonings = this.data.formData.seasonings
+    const seasonings = [...this.data.formData.seasonings]
     seasonings.splice(index, 1)
     this.setData({ 'formData.seasonings': seasonings })
   },
@@ -181,7 +355,7 @@ Page({
 
   // 添加步骤
   addStep() {
-    const steps = this.data.formData.steps
+    const steps = [...this.data.formData.steps]
     const order = steps.length + 1
     steps.push({ order, content: '', image: '' })
     this.setData({ 'formData.steps': steps })
@@ -190,7 +364,7 @@ Page({
   // 删除步骤
   deleteStep(e) {
     const index = e.currentTarget.dataset.index
-    const steps = this.data.formData.steps
+    const steps = [...this.data.formData.steps]
     steps.splice(index, 1)
     // 重新排序
     steps.forEach((step, i) => {
@@ -208,18 +382,68 @@ Page({
     })
   },
 
+  // 添加外部链接
+  addLink() {
+    const links = [...this.data.formData.links, '']
+    this.setData({ 'formData.links': links })
+  },
+
+  // 删除外部链接
+  deleteLink(e) {
+    const index = e.currentTarget.dataset.index
+    const links = [...this.data.formData.links]
+    links.splice(index, 1)
+    this.setData({ 'formData.links': links })
+  },
+
+  // 外部链接输入
+  onLinkInput(e) {
+    const index = e.currentTarget.dataset.index
+    const value = e.detail.value
+    this.setData({
+      [`formData.links[${index}]`]: value
+    })
+  },
+
   // 选择步骤图片
-  chooseStepImage(e) {
+  async chooseStepImage(e) {
     const index = e.currentTarget.dataset.index
     wx.chooseImage({
       count: 1,
       sizeType: ['compressed'],
       sourceType: ['album', 'camera'],
-      success: (res) => {
-        // TODO: 上传到云存储
-        this.setData({
-          [`formData.steps[${index}].image`]: res.tempFilePaths[0]
-        })
+      success: async (res) => {
+        wx.showLoading({ title: '上传中...' })
+
+        try {
+          // 生成唯一文件名
+          const timestamp = Date.now()
+          const random = Math.floor(Math.random() * 10000)
+          const ext = res.tempFilePaths[0].match(/\.\w+$/)[0]
+          const cloudPath = `recipe-steps/${timestamp}-${random}${ext}`
+
+          const uploadRes = await wx.cloud.uploadFile({
+            cloudPath,
+            filePath: res.tempFilePaths[0]
+          })
+
+          this.setData({
+            [`formData.steps[${index}].image`]: uploadRes.fileID
+          })
+
+          wx.hideLoading()
+          wx.showToast({
+            title: '上传成功',
+            icon: 'success'
+          })
+        } catch (err) {
+          wx.hideLoading()
+          console.error('上传步骤图片失败:', err)
+          wx.showToast({
+            title: '上传失败',
+            icon: 'none'
+          })
+        }
       }
     })
   },
@@ -243,7 +467,7 @@ Page({
   },
 
   // 保存菜谱
-  saveRecipe(status) {
+  async saveRecipe(status) {
     const formData = this.data.formData
 
     // 验证必填项
@@ -255,26 +479,87 @@ Page({
       return
     }
 
-    wx.showLoading({ title: '保存中...' })
+    // 如果是发布状态，验证更多必填项
+    if (status === 1) {
+      if (!formData.description) {
+        wx.showToast({
+          title: '请输入菜谱描述',
+          icon: 'none'
+        })
+        return
+      }
 
-    const data = {
-      ...formData,
-      status
+      if (formData.images.length === 0) {
+        wx.showToast({
+          title: '请至少上传一张图片',
+          icon: 'none'
+        })
+        return
+      }
+
+      if (formData.steps.length === 0) {
+        wx.showToast({
+          title: '请至少添加一个步骤',
+          icon: 'none'
+        })
+        return
+      }
     }
 
-    // TODO: 调用云函数保存
-    setTimeout(() => {
+    wx.showLoading({ title: '保存中...' })
+
+    try {
+      const data = {
+        ...formData,
+        status
+      }
+
+      let res
+      if (this.data.isEdit) {
+        // 编辑模式：调用 updateRecipe
+        res = await wx.cloud.callFunction({
+          name: 'recipe',
+          data: {
+            action: 'updateRecipe',
+            recipeId: this.data.recipeId,
+            ...data
+          }
+        })
+      } else {
+        // 新建模式：调用 createRecipe
+        res = await wx.cloud.callFunction({
+          name: 'recipe',
+          data: {
+            action: 'createRecipe',
+            ...data
+          }
+        })
+      }
+
       wx.hideLoading()
+
+      if (res.result.success) {
+        wx.showToast({
+          title: status === 0 ? '草稿已保存' : '发布成功',
+          icon: 'success'
+        })
+        setTimeout(() => {
+          wx.navigateBack()
+        }, 1500)
+      } else {
+        wx.showToast({
+          title: res.result.errorMessage || '保存失败',
+          icon: 'none'
+        })
+      }
+    } catch (err) {
+      wx.hideLoading()
+      console.error('保存菜谱失败:', err)
       wx.showToast({
-        title: status === 0 ? '草稿已保存' : '发布成功',
-        icon: 'success',
-        success: () => {
-          setTimeout(() => {
-            wx.navigateBack()
-          }, 1500)
-        }
+        title: '保存失败',
+        icon: 'none'
       })
-    }, 1000)
+    }
   }
 })
 

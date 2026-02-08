@@ -32,12 +32,12 @@
   <!-- 列表内容 -->
   <view class="content">
     <view class="recipe-list" wx:if="{{list.length > 0}}">
-      <view 
-        class="recipe-item" 
-        wx:for="{{list}}" 
-        wx:key="id"
+      <view
+        class="recipe-item"
+        wx:for="{{list}}"
+        wx:key="_id"
         bindtap="goToDetail"
-        data-id="{{item.id}}"
+        data-id="{{item._id}}"
         hover-class="item-hover"
       >
         <image class="recipe-image" src="{{item.images[0]}}" mode="aspectFill"></image>
@@ -45,10 +45,6 @@
           <text class="recipe-name">{{item.name}}</text>
           <text class="recipe-desc">{{item.description}}</text>
           <view class="recipe-meta">
-            <view class="meta-item">
-              <text class="meta-icon">👁️</text>
-              <text class="meta-text">{{item.viewCount || 0}}</text>
-            </view>
             <view class="meta-item">
               <text class="meta-icon">❤️</text>
               <text class="meta-text">{{item.favoriteCount || 0}}</text>

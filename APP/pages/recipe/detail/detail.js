@@ -12,90 +12,203 @@ Page({
       tasteText: '',
       difficultyText: '',
       cookingTimeText: '',
+      servingsText: '',
+      cookingMethodText: '',
       ingredients: [],
       seasonings: [],
       steps: [],
       tips: '',
       notes: '',
       links: [],
-      authorName: '',
+      authorName: '作者',
       authorAvatar: '',
       createTime: ''
     },
     isFavorite: false,
-    isOwner: false
+    isOwner: false,
+    // 枚举数据
+    enums: {
+      categories: [],
+      tastes: [],
+      difficulties: [],
+      cookingTimes: [],
+      servings: [],
+      cookingMethods: []
+    }
   },
 
   onLoad(options) {
     const recipeId = options.id
     if (recipeId) {
       this.setData({ recipeId })
-      this.loadRecipeDetail(recipeId)
+      this.loadEnums().then(() => {
+        this.loadRecipeDetail(recipeId)
+      })
     }
   },
 
+  // 加载枚举数据
+  async loadEnums() {
+    try {
+      // 缓存过期时间：24小时（单位：毫秒）
+      const CACHE_EXPIRE_TIME = 24 * 60 * 60 * 1000
+
+      // 先尝试从缓存读取
+      const cachedData = wx.getStorageSync('enumsCache')
+      if (cachedData && cachedData.enums && cachedData.timestamp) {
+        const now = Date.now()
+        const cacheAge = now - cachedData.timestamp
+
+        // 缓存未过期，直接使用
+        if (cacheAge < CACHE_EXPIRE_TIME) {
+          this.setEnumsData(cachedData.enums)
+          return
+        }
+      }
+
+      // 缓存不存在或已过期，调用云函数获取
+      const res = await wx.cloud.callFunction({
+        name: 'enum',
+        data: {
+          action: 'getEnums'
+        }
+      })
+
+      if (res.result.success) {
+        const enums = res.result.data.enums
+
+        // 缓存到本地，带时间戳
+        wx.setStorageSync('enumsCache', {
+          enums,
+          timestamp: Date.now()
+        })
+
+        this.setEnumsData(enums)
+      }
+    } catch (err) {
+      console.error('加载枚举失败:', err)
+    }
+  },
+
+  // 设置枚举数据
+  setEnumsData(enums) {
+    const categories = enums.filter(e => e.type === 'category' && e.isActive)
+      .sort((a, b) => a.sort - b.sort)
+      .map(e => ({ label: e.label, value: e.value }))
+
+    const tastes = enums.filter(e => e.type === 'taste' && e.isActive)
+      .sort((a, b) => a.sort - b.sort)
+      .map(e => ({ label: e.label, value: e.value }))
+
+    const cookingMethods = enums.filter(e => e.type === 'cookingMethod' && e.isActive)
+      .sort((a, b) => a.sort - b.sort)
+      .map(e => ({ label: e.label, value: e.value }))
+
+    const cookingTimes = enums.filter(e => e.type === 'cookingTime' && e.isActive)
+      .sort((a, b) => a.sort - b.sort)
+      .map(e => ({ label: e.label, value: e.value }))
+
+    const difficulties = enums.filter(e => e.type === 'difficulty' && e.isActive)
+      .sort((a, b) => a.sort - b.sort)
+      .map(e => ({ label: e.label, value: e.value }))
+
+    const servings = enums.filter(e => e.type === 'servings' && e.isActive)
+      .sort((a, b) => a.sort - b.sort)
+      .map(e => ({ label: e.label, value: e.value }))
+
+    this.setData({
+      'enums.categories': categories,
+      'enums.tastes': tastes,
+      'enums.cookingMethods': cookingMethods,
+      'enums.cookingTimes': cookingTimes,
+      'enums.difficulties': difficulties,
+      'enums.servings': servings
+    })
+  },
+
+  // 枚举值转文本
+  getEnumLabel(type, value) {
+    const enumList = this.data.enums[type]
+    if (!enumList || enumList.length === 0) {
+      return ''
+    }
+    const item = enumList.find(e => e.value === value)
+    return item ? item.label : ''
+  },
+
   // 加载菜谱详情
-  loadRecipeDetail(recipeId) {
+  async loadRecipeDetail(recipeId) {
     wx.showLoading({ title: '加载中...' })
 
-    // TODO: 调用云函数获取菜谱详情
-    // wx.cloud.callFunction({
-    //   name: 'getRecipeDetail',
-    //   data: { recipeId },
-    //   success: res => {
-    //     this.setData({
-    //       recipe: res.result.recipe,
-    //       isFavorite: res.result.isFavorite,
-    //       isOwner: res.result.isOwner
-    //     })
-    //   },
-    //   complete: () => {
-    //     wx.hideLoading()
-    //   }
-    // })
-
-    // 模拟数据
-    setTimeout(() => {
-      this.setData({
-        recipe: {
-          name: '家常红烧肉',
-          description: '色泽红亮，肥而不腻，入口即化的经典家常菜',
-          images: [
-            'https://picsum.photos/750/500?random=1',
-            'https://picsum.photos/750/500?random=2'
-          ],
-          categoryText: '家常菜',
-          tasteText: '微辣',
-          difficultyText: '中等',
-          cookingTimeText: '60分钟',
-          ingredients: [
-            { name: '五花肉', amount: '500g' },
-            { name: '冰糖', amount: '30g' },
-            { name: '葱姜蒜', amount: '适量' }
-          ],
-          seasonings: [
-            { name: '生抽', amount: '2勺' },
-            { name: '老抽', amount: '1勺' },
-            { name: '料酒', amount: '2勺' }
-          ],
-          steps: [
-            { order: 1, content: '五花肉切块，冷水下锅焯水去腥', image: '' },
-            { order: 2, content: '锅中放少许油，加入冰糖炒糖色', image: '' },
-            { order: 3, content: '放入五花肉翻炒上色', image: '' },
-            { order: 4, content: '加入调料和热水，大火烧开转小火炖40分钟', image: '' },
-            { order: 5, content: '大火收汁即可', image: '' }
-          ],
-          tips: '炒糖色时火候要掌握好，不要炒糊了',
-          notes: '五花肉要选择肥瘦相间的',
-          links: [],
-          authorName: '美食家',
-          authorAvatar: 'https://picsum.photos/100?random=1',
-          createTime: '2026-02-04'
-        },
-        isOwner: true
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'recipe',
+        data: {
+          action: 'getRecipeDetail',
+          recipeId
+        }
       })
+
       wx.hideLoading()
-    }, 500)
+
+      if (res.result.success) {
+        const recipe = res.result.data.recipe
+        const canEdit = res.result.data.canEdit
+
+        // 枚举值转文本
+        const categoryText = this.getEnumLabel('categories', recipe.category)
+        const tasteText = this.getEnumLabel('tastes', recipe.taste)
+        const difficultyText = this.getEnumLabel('difficulties', recipe.difficulty)
+        const cookingTimeText = this.getEnumLabel('cookingTimes', recipe.cookingTime)
+        const servingsText = this.getEnumLabel('servings', recipe.servings)
+        const cookingMethodText = this.getEnumLabel('cookingMethods', recipe.cookingMethod)
+
+        // 格式化创建时间
+        const createTime = this.formatDate(recipe.createTime)
+
+        this.setData({
+          recipe: {
+            ...recipe,
+            categoryText,
+            tasteText,
+            difficultyText,
+            cookingTimeText,
+            servingsText,
+            cookingMethodText,
+            createTime
+          },
+          isOwner: canEdit
+        })
+      } else {
+        wx.showToast({
+          title: res.result.errorMessage || '加载失败',
+          icon: 'none'
+        })
+        setTimeout(() => {
+          wx.navigateBack()
+        }, 1500)
+      }
+    } catch (err) {
+      wx.hideLoading()
+      console.error('加载菜谱失败:', err)
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none'
+      })
+      setTimeout(() => {
+        wx.navigateBack()
+      }, 1500)
+    }
+  },
+
+  // 格式化日期
+  formatDate(date) {
+    if (!date) return ''
+    const d = new Date(date)
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
   },
 
   // 预览图片
@@ -132,18 +245,43 @@ Page({
     wx.showModal({
       title: '确认删除',
       content: '删除后无法恢复，确定要删除这个菜谱吗？',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          // TODO: 调用云函数删除
-          wx.showToast({
-            title: '删除成功',
-            icon: 'success',
-            success: () => {
+          wx.showLoading({ title: '删除中...' })
+
+          try {
+            const result = await wx.cloud.callFunction({
+              name: 'recipe',
+              data: {
+                action: 'deleteRecipe',
+                recipeId: this.data.recipeId
+              }
+            })
+
+            wx.hideLoading()
+
+            if (result.result.success) {
+              wx.showToast({
+                title: '删除成功',
+                icon: 'success'
+              })
               setTimeout(() => {
                 wx.navigateBack()
               }, 1500)
+            } else {
+              wx.showToast({
+                title: result.result.errorMessage || '删除失败',
+                icon: 'none'
+              })
             }
-          })
+          } catch (err) {
+            wx.hideLoading()
+            console.error('删除菜谱失败:', err)
+            wx.showToast({
+              title: '删除失败',
+              icon: 'none'
+            })
+          }
         }
       }
     })
@@ -177,4 +315,3 @@ Page({
     }
   }
 })
-

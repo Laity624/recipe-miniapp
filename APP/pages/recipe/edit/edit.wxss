@@ -1,56 +1,93 @@
 /* pages/recipe/edit/edit.wxss */
 
 .edit-page {
-  min-height: 100vh;
+  height: 100%;
+  padding-bottom: 140rpx;
+  overflow-y: auto;
   background-color: var(--bg-color);
-  padding-bottom: 160rpx;
 }
 
 /* ========== 表单区块 ========== */
 .form-section {
   background-color: var(--card-bg);
-  margin: 24rpx;
-  padding: 32rpx;
+  margin: var(--spacing-sm) var(--spacing-md);
+  padding: var(--spacing-lg);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-level-1);
 }
 
 .section-title {
   font-size: var(--font-lg);
   font-weight: 600;
   color: var(--text-main);
-  margin-bottom: 24rpx;
+  margin-bottom: var(--spacing-md);
 }
 
 .section-title-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24rpx;
+  margin-bottom: var(--spacing-md);
+}
+
+.section-title-row .section-title {
+  margin-bottom: 0;
 }
 
 .add-btn-small {
-  padding: 8rpx 20rpx;
-  background-color: var(--primary-light);
-  color: var(--primary-color);
+  padding: var(--spacing-xs) 20rpx;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
   font-size: var(--font-sm);
   border-radius: var(--radius-capsule);
 }
 
+.add-btn-small-hover {
+  opacity: 0.7;
+}
+
 /* ========== 表单项 ========== */
 .form-item {
-  margin-bottom: 32rpx;
+  margin-bottom: var(--spacing-lg);
 }
 
 .form-item:last-child {
   margin-bottom: 0;
 }
 
+.form-item-inline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-item-inline .label-row {
+  margin-bottom: 0;
+}
+
+.required {
+  color: var(--color-error);
+  font-size: var(--font-sm);
+}
+
 .label {
   display: block;
   font-size: var(--font-base);
   color: var(--text-main);
-  margin-bottom: 16rpx;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 500;
+}
+
+.label-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.label-tip {
+  font-size: var(--font-xs);
+  color: var(--text-light);
 }
 
 .input {
@@ -72,19 +109,57 @@
   color: var(--text-main);
 }
 
-.picker {
+/* ========== Picker 两列网格 ========== */
+.picker-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.picker-grid-item {
+  width: calc(50% - var(--spacing-xs));
+}
+
+.picker-cell {
   padding: 20rpx;
   background-color: var(--bg-color);
   border-radius: var(--radius-base);
+  transition: background-color 0.2s;
+}
+
+.picker-cell-hover {
+  background-color: var(--bg-color-grey);
+}
+
+.picker-label {
+  font-size: var(--font-xs);
+  color: var(--text-light);
+  margin-bottom: var(--spacing-xs);
+  display: block;
+}
+
+.picker-value-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.picker-value {
   font-size: var(--font-base);
   color: var(--text-main);
+}
+
+.picker-arrow {
+  font-size: var(--font-xl);
+  color: var(--text-placeholder);
+  font-weight: 300;
 }
 
 /* ========== 图片上传 ========== */
 .image-upload-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 16rpx;
+  gap: var(--spacing-sm);
 }
 
 .image-item {
@@ -102,18 +177,22 @@
 
 .delete-btn {
   position: absolute;
-  top: 8rpx;
-  right: 8rpx;
-  width: 48rpx;
-  height: 48rpx;
-  background-color: rgba(0, 0, 0, 0.6);
+  top: var(--spacing-xs);
+  right: var(--spacing-xs);
+  width: 44rpx;
+  height: 44rpx;
+  background-color: rgba(0, 0, 0, 0.5);
   color: #ffffff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 36rpx;
+  font-size: 32rpx;
   font-weight: 300;
+}
+
+.delete-btn-hover {
+  background-color: rgba(0, 0, 0, 0.75);
 }
 
 .upload-btn {
@@ -125,12 +204,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8rpx;
+  gap: var(--spacing-xs);
+  border: 2rpx dashed var(--text-placeholder);
+}
+
+.upload-btn-hover {
+  background-color: var(--bg-color-grey);
 }
 
 .upload-icon {
   font-size: 48rpx;
   color: var(--text-placeholder);
+  line-height: 1;
 }
 
 .upload-text {
@@ -142,18 +227,18 @@
 .ingredient-list {
   display: flex;
   flex-direction: column;
-  gap: 16rpx;
+  gap: var(--spacing-sm);
 }
 
 .ingredient-item {
   display: flex;
   align-items: center;
-  gap: 12rpx;
+  gap: var(--spacing-xs);
 }
 
 .ingredient-name {
   flex: 2;
-  padding: 16rpx;
+  padding: var(--spacing-sm);
   background-color: var(--bg-color);
   border-radius: var(--radius-base);
   font-size: var(--font-base);
@@ -161,43 +246,86 @@
 
 .ingredient-amount {
   flex: 1;
-  padding: 16rpx;
+  padding: var(--spacing-sm);
   background-color: var(--bg-color);
   border-radius: var(--radius-base);
   font-size: var(--font-base);
 }
 
 .delete-icon {
-  width: 48rpx;
-  height: 48rpx;
-  background-color: var(--color-error);
-  color: #ffffff;
+  flex-shrink: 0;
+  width: 44rpx;
+  height: 44rpx;
+  color: var(--text-light);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32rpx;
+  font-size: 36rpx;
   font-weight: 300;
+}
+
+.delete-icon-hover {
+  background-color: var(--bg-color-grey);
+  color: var(--color-error);
+}
+
+/* ========== 空状态提示 ========== */
+.empty-tip {
+  padding: var(--spacing-lg) 0;
+  text-align: center;
+}
+
+.empty-tip-text {
+  font-size: var(--font-sm);
+  color: var(--text-placeholder);
+}
+
+/* ========== 外部链接列表 ========== */
+.link-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.link-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.link-input {
+  flex: 1;
+  padding: var(--spacing-sm);
+  background-color: var(--bg-color);
+  border-radius: var(--radius-base);
+  font-size: var(--font-base);
 }
 
 /* ========== 步骤列表 ========== */
 .steps-list {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
+  gap: var(--spacing-md);
 }
 
 .step-item {
+  background-color: var(--bg-color);
+  border-radius: var(--radius-base);
+  padding: var(--spacing-md);
+}
+
+.step-header {
   display: flex;
-  gap: 16rpx;
-  position: relative;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
 }
 
 .step-number {
-  flex-shrink: 0;
-  width: 48rpx;
-  height: 48rpx;
-  background: linear-gradient(135deg, #FF9F7F, #FF8E66);
+  width: 44rpx;
+  height: 44rpx;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
   color: #ffffff;
   border-radius: 50%;
   display: flex;
@@ -207,34 +335,42 @@
   font-weight: 600;
 }
 
+.delete-icon-sm {
+  width: 40rpx;
+  height: 40rpx;
+  font-size: 32rpx;
+}
+
 .step-content {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
 
 .step-textarea {
   width: 100%;
   min-height: 120rpx;
-  padding: 16rpx;
-  background-color: var(--bg-color);
-  border-radius: var(--radius-base);
+  padding: var(--spacing-sm);
+  background-color: var(--card-bg);
+  border-radius: var(--radius-sm);
   font-size: var(--font-base);
-  margin-bottom: 12rpx;
 }
 
 .step-image-upload {
-  padding: 40rpx;
-  background-color: var(--bg-color);
-  border-radius: var(--radius-base);
+  padding: var(--spacing-lg);
+  background-color: var(--card-bg);
+  border-radius: var(--radius-sm);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8rpx;
+  gap: var(--spacing-xs);
   border: 2rpx dashed var(--text-placeholder);
 }
 
 .upload-icon-small {
   font-size: 36rpx;
   color: var(--text-placeholder);
+  line-height: 1;
 }
 
 .upload-text-small {
@@ -248,23 +384,7 @@
 
 .step-image {
   width: 100%;
-  border-radius: var(--radius-base);
-}
-
-.delete-step-image {
-  position: absolute;
-  top: 8rpx;
-  right: 8rpx;
-  width: 48rpx;
-  height: 48rpx;
-  background-color: rgba(0, 0, 0, 0.6);
-  color: #ffffff;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 36rpx;
-  font-weight: 300;
+  border-radius: var(--radius-sm);
 }
 
 /* ========== 底部按钮 ========== */
@@ -275,28 +395,32 @@
   right: 0;
   display: flex;
   gap: 20rpx;
-  padding: 20rpx 24rpx;
+  padding: 20rpx var(--spacing-md);
   padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
   background-color: var(--card-bg);
-  box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.05);
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.04);
   z-index: 100;
 }
 
 .btn-secondary {
   flex: 1;
-  padding: 24rpx;
-  background-color: var(--bg-grey);
-  color: var(--text-main);
+  padding: var(--spacing-md);
+  background-color: var(--bg-color-grey);
+  color: var(--text-sub);
   border-radius: var(--radius-capsule);
   font-size: var(--font-base);
   font-weight: 600;
   border: none;
 }
 
+.btn-secondary-hover {
+  background-color: #EBEBEB;
+}
+
 .btn-primary {
   flex: 1;
-  padding: 24rpx;
-  background: linear-gradient(135deg, #FF9F7F, #FF8E66);
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
   color: #ffffff;
   border-radius: var(--radius-capsule);
   font-size: var(--font-base);
@@ -305,3 +429,6 @@
   border: none;
 }
 
+.btn-primary-hover {
+  opacity: 0.85;
+}
