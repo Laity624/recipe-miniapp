@@ -1,26 +1,25 @@
 /**
- * 用户模块云函数
+ * 收藏模块云函数
  *
  * 功能列表：
- * - login: 用户登录（获取或创建用户信息）
- * - updateInfo: 更新用户信息（昵称、个人简介、手机号）
- * - search: 搜索用户（通过身份码或昵称）
- * - getUserStats: 获取用户统计数据（菜谱数、好友数、获赞数）
+ * - addFavorite: 收藏菜谱
+ * - removeFavorite: 取消收藏
+ * - getFavoriteList: 获取收藏列表（支持筛选和排序）
+ * - checkFavoriteStatus: 检查收藏状态
  *
  * 调用方式：
  * wx.cloud.callFunction({
- *   name: 'user',
+ *   name: 'favorite',
  *   data: {
- *     action: 'login',
- *     nickName: '张三',
- *     avatarUrl: 'https://...'
+ *     action: 'addFavorite',
+ *     recipeId: 'xxx',
+ *     ...
  *   }
  * })
  *
- * @module cloudfunctions/user
+ * @module cloudfunctions/favorite
  * @author Claude
- * @date 2026-02-05
- * @updated 2026-02-09 添加 getUserStats 接口
+ * @date 2026-02-09
  */
 
 const cloud = require('wx-server-sdk');
@@ -28,10 +27,10 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
 // 动态路由映射
 const handlers = {
-  login: require('./login'),
-  updateInfo: require('./updateInfo'),
-  search: require('./search'),
-  getUserStats: require('./getUserStats')
+  addFavorite: require('./addFavorite'),
+  removeFavorite: require('./removeFavorite'),
+  getFavoriteList: require('./getFavoriteList'),
+  checkFavoriteStatus: require('./checkFavoriteStatus')
 };
 
 exports.main = async (event, context) => {
@@ -50,7 +49,7 @@ exports.main = async (event, context) => {
     // 调用对应的处理函数
     return await handlers[action].main(event, context);
   } catch (err) {
-    console.error(`[user/${action}] 执行失败:`, err);
+    console.error(`[favorite/${action}] 执行失败:`, err);
     return {
       success: false,
       errorCode: 'SYSTEM_ERROR',

@@ -1,38 +1,111 @@
 <!--pages/favorite/favorite.wxml-->
 <view class="favorite-page">
-  
+
+  <!-- 顶部统计 -->
+  <view class="stats-bar">
+    <text class="stats-text">共收藏 {{total}} 个菜谱</text>
+  </view>
+
+  <!-- 搜索框 -->
+  <view class="search-bar">
+    <van-search
+      value="{{keyword}}"
+      placeholder="搜索菜谱名称"
+      bind:change="onSearchChange"
+      bind:search="onSearch"
+      bind:clear="onSearchClear"
+    />
+  </view>
+
+  <!-- 筛选栏 -->
+  <van-dropdown-menu active-color="#FF9F7F">
+    <van-dropdown-item
+      value="{{filterCategory}}"
+      options="{{categoryOptions}}"
+      bind:change="onCategoryChange"
+    />
+    <van-dropdown-item
+      value="{{filterTaste}}"
+      options="{{tasteOptions}}"
+      bind:change="onTasteChange"
+    />
+    <van-dropdown-item
+      value="{{filterMethod}}"
+      options="{{methodOptions}}"
+      bind:change="onMethodChange"
+    />
+  </van-dropdown-menu>
+
   <!-- 收藏列表 -->
   <view class="favorite-list" wx:if="{{list.length > 0}}">
-    <view 
-      class="favorite-item" 
-      wx:for="{{list}}" 
-      wx:key="id"
+    <view
+      class="favorite-item"
+      wx:for="{{list}}"
+      wx:key="favoriteId"
       bindtap="goToDetail"
       data-id="{{item.recipeId}}"
+      data-deleted="{{item.isDeleted}}"
+      data-private="{{item.isPrivate}}"
       hover-class="item-hover"
     >
-      <image class="recipe-image" src="{{item.recipeImage}}" mode="aspectFill"></image>
+      <!-- 菜谱图片 -->
+      <view class="recipe-image-wrapper">
+        <image
+          class="recipe-image"
+          src="{{item.recipeImages[0] || '/assets/images/default-recipe.png'}}"
+          mode="aspectFill"
+          lazy-load
+        ></image>
+        <!-- 状态遮罩 -->
+        <view class="recipe-mask" wx:if="{{item.isDeleted || item.isPrivate}}">
+          <text class="mask-text">{{item.isDeleted ? '已删除' : '已私密'}}</text>
+        </view>
+      </view>
+
+      <!-- 菜谱信息 -->
       <view class="recipe-info">
         <text class="recipe-name">{{item.recipeName}}</text>
-        <text class="recipe-desc">{{item.recipeDesc}}</text>
+
+        <!-- 标签 -->
+        <view class="recipe-tags">
+          <text class="tag" wx:if="{{item.categoryLabel}}">{{item.categoryLabel}}</text>
+          <text class="tag" wx:if="{{item.tasteLabel}}">{{item.tasteLabel}}</text>
+        </view>
+
+        <!-- 作者和时间 -->
         <view class="author-info">
           <image class="author-avatar" src="{{item.authorAvatar}}" mode="aspectFill"></image>
           <text class="author-name">{{item.authorName}}</text>
-          <text class="favorite-time">{{item.createTime}}</text>
+          <text class="favorite-time">{{item.createTimeText}}</text>
         </view>
       </view>
-      <view class="action-btn" catchtap="cancelFavorite" data-id="{{item.id}}">
+
+      <!-- 取消收藏按钮 -->
+      <view class="action-btn" catchtap="cancelFavorite" data-id="{{item.recipeId}}">
         <text class="heart-icon">❤️</text>
       </view>
     </view>
   </view>
 
+  <!-- 加载状态 -->
+  <view class="loading-more" wx:if="{{loading}}">
+    <van-loading type="spinner" size="24px">加载中...</van-loading>
+  </view>
+
+  <!-- 没有更多 -->
+  <view class="no-more" wx:if="{{!hasMore && list.length > 0 && !loading}}">
+    <text>没有更多了</text>
+  </view>
+
   <!-- 空状态 -->
-  <view class="empty-state" wx:else>
-    <text class="empty-icon">⭐</text>
-    <text class="empty-text">还没有收藏任何菜谱</text>
-    <view class="empty-btn" bindtap="goToIndex">去发现</view>
+  <view class="empty-wrapper" wx:if="{{!loading && list.length === 0}}">
+    <van-empty
+      description="{{emptyText}}"
+      image="search"
+    >
+      <view class="empty-btn" bindtap="goToIndex" wx:if="{{!keyword && !hasFilter}}">去发现</view>
+      <view class="empty-btn" bindtap="resetFilter" wx:else>清空筛选</view>
+    </van-empty>
   </view>
 
 </view>
-

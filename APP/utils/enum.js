@@ -24,15 +24,57 @@ const ENUM_TYPES = {
  */
 async function getAllEnums(forceRefresh = false) {
   const app = getApp()
-  
-  // 如果已缓存且不强制刷新，直接返回缓存
+
+  // 如果内存中已缓存且不强制刷新，直接返回缓存
   if (!forceRefresh && app.globalData.enums) {
     return app.globalData.enums
   }
 
+  // 缓存过期时间：24小时（单位：毫秒）
+  const CACHE_EXPIRE_TIME = 24 * 60 * 60 * 1000
+
+  // 尝试从本地存储读取缓存
+  if (!forceRefresh) {
+    try {
+      const cachedData = wx.getStorageSync('enumsCache')
+      if (cachedData && cachedData.enums && cachedData.timestamp) {
+        const now = Date.now()
+        const cacheAge = now - cachedData.timestamp
+
+        // 缓存未过期，使用缓存数据
+        if (cacheAge < CACHE_EXPIRE_TIME) {
+          // 按类型分组
+          const enumsMap = {}
+          Object.values(ENUM_TYPES).forEach(type => {
+            enumsMap[type] = cachedData.enums
+              .filter(item => item.type === type && item.isActive)
+              .sort((a, b) => a.sort - b.sort)
+          })
+
+          // 缓存到内存
+          app.globalData.enums = enumsMap
+          return enumsMap
+        }
+      }
+    } catch (err) {
+      console.error('读取枚举缓存失败:', err)
+    }
+  }
+
+  // 缓存不存在或已过期，调用云函数获取
   try {
-    const enums = await callFunction('getEnums', {}, false)
-    
+    const { enums } = await callFunction('enum', { action: 'getEnums' })
+
+    // 保存到本地存储，带时间戳
+    try {
+      wx.setStorageSync('enumsCache', {
+        enums,
+        timestamp: Date.now()
+      })
+    } catch (err) {
+      console.error('保存枚举缓存失败:', err)
+    }
+
     // 按类型分组
     const enumsMap = {}
     Object.values(ENUM_TYPES).forEach(type => {
@@ -41,9 +83,9 @@ async function getAllEnums(forceRefresh = false) {
         .sort((a, b) => a.sort - b.sort)
     })
 
-    // 缓存到全局
+    // 缓存到内存
     app.globalData.enums = enumsMap
-    
+
     return enumsMap
   } catch (err) {
     console.error('获取枚举失败:', err)

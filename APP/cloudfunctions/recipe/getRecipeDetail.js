@@ -4,6 +4,8 @@
  * 功能描述：
  * 1. 获取菜谱的完整信息
  * 2. 进行权限校验（草稿/私密/公开的访问权限）
+ * 3. 查询收藏状态
+ * 4. 查询作者信息
  *
  * 业务逻辑：
  * - 参数校验：recipeId 必填
@@ -13,17 +15,21 @@
  *   - 已发布+私密（status=1, isPublic=0）：仅创建者可见
  *   - 已发布+公开（status=1, isPublic=1）：所有好友可见
  *   - 软删除（isDeleted=true）：任何人都不可见
+ * - 查询收藏状态
+ * - 查询作者信息
  * - 返回完整菜谱信息
  *
  * 数据库操作：
  * - 查询 recipes 表
  * - 查询 friends 表（校验好友关系）
+ * - 查询 favorites 表（查询收藏状态）
+ * - 查询 users 表（查询作者信息）
  *
  * 参数：
  * @param {string} event.recipeId - 菜谱ID（必填）
  *
  * 返回：
- * @returns {Object} { success: true, data: { recipe } }
+ * @returns {Object} { success: true, data: { recipe, canEdit, isFavorite, author } }
  *
  * 错误码：
  * - INVALID_PARAMS: 参数错误
@@ -33,6 +39,7 @@
  *
  * @author Claude
  * @date 2026-02-06
+ * @updated 2026-02-09 添加收藏状态查询和作者信息查询
  */
 
 const cloud = require('wx-server-sdk');
@@ -79,10 +86,40 @@ exports.main = async (event, context) => {
       return error('PERMISSION_DENIED', permission.message);
     }
 
-    // 5. 返回菜谱信息
+    // 5. 查询收藏状态
+    const favoriteResult = await db.collection('favorites')
+      .where({
+        _openid: OPENID,
+        recipeId: recipeId
+      })
+      .limit(1)
+      .get();
+
+    const isFavorite = favoriteResult.data.length > 0;
+
+    // 6. 查询作者信息
+    const authorResult = await db.collection('users')
+      .where({
+        _openid: recipe._openid
+      })
+      .field({
+        nickName: true,
+        avatarUrl: true
+      })
+      .limit(1)
+      .get();
+
+    const author = authorResult.data[0] || {};
+
+    // 7. 返回菜谱信息（包含收藏状态和作者信息）
     return success({
       recipe,
-      canEdit: permission.canEdit
+      canEdit: permission.canEdit,
+      isFavorite,
+      author: {
+        nickname: author.nickName || '未知用户',
+        avatarUrl: author.avatarUrl || ''
+      }
     });
 
   } catch (err) {

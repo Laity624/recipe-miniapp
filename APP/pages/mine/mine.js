@@ -34,6 +34,9 @@ Page({
 
       // 同步到全局数据
       app.globalData.userInfo = userInfo;
+
+      // 实时查询统计数据
+      this.getUserStats();
     } else {
       // 未登录，引导登录
       this.showLoginTip();
@@ -41,9 +44,33 @@ Page({
   },
 
   // 获取用户统计数据
-  getUserStats() {
-    // 统计数据已经在用户信息中，暂时不需要单独获取
-    // 后续如果需要实时更新统计数据，可以在这里调用云函数
+  async getUserStats() {
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'user',
+        data: {
+          action: 'getUserStats'
+        }
+      });
+
+      if (res.result.success) {
+        const stats = res.result.data;
+
+        // 更新统计数据
+        this.setData({
+          'userInfo.recipeCount': stats.recipeCount,
+          'userInfo.friendCount': stats.friendCount,
+          'userInfo.favoriteCount': stats.favoriteCount
+        });
+
+        // 同步更新全局数据和缓存
+        const userInfo = this.data.userInfo;
+        app.globalData.userInfo = userInfo;
+        wx.setStorageSync('userInfo', userInfo);
+      }
+    } catch (err) {
+      console.error('获取统计数据失败:', err);
+    }
   },
 
   // 页面跳转

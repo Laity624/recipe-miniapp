@@ -163,6 +163,8 @@ exports.main = async (event, context) => {
         category: true,
         taste: true,
         cookingMethod: true,
+        cookingTime: true,
+        difficulty: true,
         status: true,
         isPublic: true,
         favoriteCount: true,
@@ -174,9 +176,38 @@ exports.main = async (event, context) => {
       .limit(pageSize)
       .get();
 
-    // 5. 返回结果
+    // 5. 批量查询作者信息
+    const authorOpenids = [...new Set(recipesResult.data.map(r => r._openid))];
+
+    let authorMap = {};
+    if (authorOpenids.length > 0) {
+      const authorsResult = await db.collection('users')
+        .where({
+          _openid: _.in(authorOpenids)
+        })
+        .field({
+          _openid: true,
+          nickName: true,
+          avatarUrl: true
+        })
+        .get();
+
+      // 创建作者映射表
+      authorsResult.data.forEach(author => {
+        authorMap[author._openid] = author;
+      });
+    }
+
+    // 6. 组合数据（添加作者信息）
+    const recipesWithAuthor = recipesResult.data.map(recipe => ({
+      ...recipe,
+      authorName: authorMap[recipe._openid]?.nickName || '未知用户',
+      authorAvatar: authorMap[recipe._openid]?.avatarUrl || ''
+    }));
+
+    // 7. 返回结果
     return success({
-      recipes: recipesResult.data,
+      recipes: recipesWithAuthor,
       total,
       hasMore: skip + recipesResult.data.length < total
     });

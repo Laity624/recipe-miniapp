@@ -110,8 +110,48 @@ function debounce(fn, delay = 500) {
   }
 }
 
+/**
+ * 格式化为友好时间
+ * @param {Date|String} date 日期对象或时间字符串
+ * @returns {String} 友好时间字符串（刚刚、5分钟前、2天前等）
+ */
+function formatFriendlyTime(date) {
+  if (!date) return ''
+
+  const now = Date.now()
+  const timestamp = new Date(date).getTime()
+  const diff = now - timestamp
+
+  // 小于1分钟
+  if (diff < 60000) {
+    return '刚刚'
+  }
+
+  // 小于1小时
+  if (diff < 3600000) {
+    const minutes = Math.floor(diff / 60000)
+    return `${minutes}分钟前`
+  }
+
+  // 小于1天
+  if (diff < 86400000) {
+    const hours = Math.floor(diff / 3600000)
+    return `${hours}小时前`
+  }
+
+  // 小于30天
+  if (diff < 2592000000) {
+    const days = Math.floor(diff / 86400000)
+    return `${days}天前`
+  }
+
+  // 超过30天，显示日期
+  return formatTime(date, 'YYYY-MM-DD')
+}
+
 module.exports = {
   formatTime,
+  formatFriendlyTime,
   showToast,
   showLoading,
   hideLoading,

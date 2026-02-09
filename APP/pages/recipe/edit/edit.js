@@ -1,4 +1,6 @@
 // pages/recipe/edit/edit.js
+const { getEnumsByType, ENUM_TYPES } = require('../../../utils/enum.js')
+
 Page({
   data: {
     recipeId: '',
@@ -42,46 +44,24 @@ Page({
   // 加载枚举数据
   async loadEnums() {
     try {
-      // 缓存过期时间：24小时（单位：毫秒）
-      const CACHE_EXPIRE_TIME = 24 * 60 * 60 * 1000
+      // 使用 enum.js 工具类获取枚举
+      const [categories, tastes, cookingMethods, cookingTimes, difficulties, servings] = await Promise.all([
+        getEnumsByType(ENUM_TYPES.CATEGORY),
+        getEnumsByType(ENUM_TYPES.TASTE),
+        getEnumsByType(ENUM_TYPES.COOKING_METHOD),
+        getEnumsByType(ENUM_TYPES.COOKING_TIME),
+        getEnumsByType(ENUM_TYPES.DIFFICULTY),
+        getEnumsByType(ENUM_TYPES.SERVINGS)
+      ])
 
-      // 先尝试从缓存读取
-      const cachedData = wx.getStorageSync('enumsCache')
-      if (cachedData && cachedData.enums && cachedData.timestamp) {
-        const now = Date.now()
-        const cacheAge = now - cachedData.timestamp
-
-        // 缓存未过期，直接使用
-        if (cacheAge < CACHE_EXPIRE_TIME) {
-          this.setEnumsData(cachedData.enums)
-          return
-        }
-      }
-
-      // 缓存不存在或已过期，调用云函数获取
-      const res = await wx.cloud.callFunction({
-        name: 'enum',
-        data: {
-          action: 'getEnums'
-        }
+      this.setData({
+        categories,
+        tastes,
+        cookingMethods,
+        cookingTimes,
+        difficulties,
+        servings
       })
-
-      if (res.result.success) {
-        const enums = res.result.data.enums
-
-        // 缓存到本地，带时间戳
-        wx.setStorageSync('enumsCache', {
-          enums,
-          timestamp: Date.now()
-        })
-
-        this.setEnumsData(enums)
-      } else {
-        wx.showToast({
-          title: '加载枚举失败',
-          icon: 'none'
-        })
-      }
     } catch (err) {
       console.error('加载枚举失败:', err)
       wx.showToast({
@@ -89,42 +69,6 @@ Page({
         icon: 'none'
       })
     }
-  },
-
-  // 设置枚举数据
-  setEnumsData(enums) {
-    const categories = enums.filter(e => e.type === 'category' && e.isActive)
-      .sort((a, b) => a.sort - b.sort)
-      .map(e => ({ label: e.label, value: e.value }))
-
-    const tastes = enums.filter(e => e.type === 'taste' && e.isActive)
-      .sort((a, b) => a.sort - b.sort)
-      .map(e => ({ label: e.label, value: e.value }))
-
-    const cookingMethods = enums.filter(e => e.type === 'cookingMethod' && e.isActive)
-      .sort((a, b) => a.sort - b.sort)
-      .map(e => ({ label: e.label, value: e.value }))
-
-    const cookingTimes = enums.filter(e => e.type === 'cookingTime' && e.isActive)
-      .sort((a, b) => a.sort - b.sort)
-      .map(e => ({ label: e.label, value: e.value }))
-
-    const difficulties = enums.filter(e => e.type === 'difficulty' && e.isActive)
-      .sort((a, b) => a.sort - b.sort)
-      .map(e => ({ label: e.label, value: e.value }))
-
-    const servings = enums.filter(e => e.type === 'servings' && e.isActive)
-      .sort((a, b) => a.sort - b.sort)
-      .map(e => ({ label: e.label, value: e.value }))
-
-    this.setData({
-      categories,
-      tastes,
-      cookingMethods,
-      cookingTimes,
-      difficulties,
-      servings
-    })
   },
 
   // 加载菜谱数据（编辑模式）

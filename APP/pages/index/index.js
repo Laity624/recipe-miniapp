@@ -1,4 +1,6 @@
 // pages/index/index.js
+const { getEnumsByType, getEnumLabel, ENUM_TYPES } = require('../../utils/enum.js')
+
 Page({
   data: {
     currentTag: 0,
@@ -18,10 +20,9 @@ Page({
     }
   },
 
-  onLoad(options) {
-    this.loadEnums().then(() => {
-      this.loadRecipes()
-    })
+  async onLoad(options) {
+    await this.loadEnums()
+    this.loadRecipes()
   },
 
   onShow() {
@@ -37,72 +38,28 @@ Page({
   // 加载枚举数据
   async loadEnums() {
     try {
-      // 缓存过期时间：24小时（单位：毫秒）
-      const CACHE_EXPIRE_TIME = 24 * 60 * 60 * 1000
+      // 使用 enum.js 工具类获取枚举
+      const [categories, cookingTimes, difficulties] = await Promise.all([
+        getEnumsByType(ENUM_TYPES.CATEGORY),
+        getEnumsByType(ENUM_TYPES.COOKING_TIME),
+        getEnumsByType(ENUM_TYPES.DIFFICULTY)
+      ])
 
-      // 先尝试从缓存读取
-      const cachedData = wx.getStorageSync('enumsCache')
-      if (cachedData && cachedData.enums && cachedData.timestamp) {
-        const now = Date.now()
-        const cacheAge = now - cachedData.timestamp
+      // 构建标签列表：在分类前面添加"全部"
+      const tags = [
+        { label: '全部', value: null },
+        ...categories
+      ]
 
-        // 缓存未过期，直接使用
-        if (cacheAge < CACHE_EXPIRE_TIME) {
-          this.setEnumsData(cachedData.enums)
-          return
-        }
-      }
-
-      // 缓存不存在或已过期，调用云函数获取
-      const res = await wx.cloud.callFunction({
-        name: 'enum',
-        data: {
-          action: 'getEnums'
-        }
+      this.setData({
+        'enums.categories': categories,
+        'enums.cookingTimes': cookingTimes,
+        'enums.difficulties': difficulties,
+        tags
       })
-
-      if (res.result.success) {
-        const enums = res.result.data.enums
-
-        // 缓存到本地，带时间戳
-        wx.setStorageSync('enumsCache', {
-          enums,
-          timestamp: Date.now()
-        })
-
-        this.setEnumsData(enums)
-      }
     } catch (err) {
       console.error('加载枚举失败:', err)
     }
-  },
-
-  // 设置枚举数据
-  setEnumsData(enums) {
-    const categories = enums.filter(e => e.type === 'category' && e.isActive)
-      .sort((a, b) => a.sort - b.sort)
-      .map(e => ({ label: e.label, value: e.value }))
-
-    const cookingTimes = enums.filter(e => e.type === 'cookingTime' && e.isActive)
-      .sort((a, b) => a.sort - b.sort)
-      .map(e => ({ label: e.label, value: e.value }))
-
-    const difficulties = enums.filter(e => e.type === 'difficulty' && e.isActive)
-      .sort((a, b) => a.sort - b.sort)
-      .map(e => ({ label: e.label, value: e.value }))
-
-    // 构建标签列表：在分类前面添加"全部"
-    const tags = [
-      { label: '全部', value: null },
-      ...categories
-    ]
-
-    this.setData({
-      'enums.categories': categories,
-      'enums.cookingTimes': cookingTimes,
-      'enums.difficulties': difficulties,
-      tags
-    })
   },
 
   // 枚举值转文本
@@ -193,8 +150,8 @@ Page({
       image: recipe.images && recipe.images.length > 0 ? recipe.images[0] : '',
       time: this.getEnumLabel('cookingTimes', recipe.cookingTime) || '未知',
       difficulty: this.getEnumLabel('difficulties', recipe.difficulty) || '未知',
-      author: '作者', // 暂时固定显示
-      avatar: 'https://picsum.photos/50?random=1', // 暂时使用默认头像
+      author: recipe.authorName || '未知用户',
+      avatar: recipe.authorAvatar || '',
       likes: recipe.favoriteCount || 0
     }
   },

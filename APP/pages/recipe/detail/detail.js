@@ -1,5 +1,6 @@
 // pages/recipe/detail/detail.js
 const app = getApp()
+const { getEnumsByType, ENUM_TYPES } = require('../../../utils/enum.js')
 
 Page({
   data: {
@@ -37,93 +38,39 @@ Page({
     }
   },
 
-  onLoad(options) {
+  async onLoad(options) {
     const recipeId = options.id
     if (recipeId) {
       this.setData({ recipeId })
-      this.loadEnums().then(() => {
-        this.loadRecipeDetail(recipeId)
-      })
+      await this.loadEnums()
+      this.loadRecipeDetail(recipeId)
     }
   },
 
   // 加载枚举数据
   async loadEnums() {
     try {
-      // 缓存过期时间：24小时（单位：毫秒）
-      const CACHE_EXPIRE_TIME = 24 * 60 * 60 * 1000
+      // 使用 enum.js 工具类获取枚举
+      const [categories, tastes, cookingMethods, cookingTimes, difficulties, servings] = await Promise.all([
+        getEnumsByType(ENUM_TYPES.CATEGORY),
+        getEnumsByType(ENUM_TYPES.TASTE),
+        getEnumsByType(ENUM_TYPES.COOKING_METHOD),
+        getEnumsByType(ENUM_TYPES.COOKING_TIME),
+        getEnumsByType(ENUM_TYPES.DIFFICULTY),
+        getEnumsByType(ENUM_TYPES.SERVINGS)
+      ])
 
-      // 先尝试从缓存读取
-      const cachedData = wx.getStorageSync('enumsCache')
-      if (cachedData && cachedData.enums && cachedData.timestamp) {
-        const now = Date.now()
-        const cacheAge = now - cachedData.timestamp
-
-        // 缓存未过期，直接使用
-        if (cacheAge < CACHE_EXPIRE_TIME) {
-          this.setEnumsData(cachedData.enums)
-          return
-        }
-      }
-
-      // 缓存不存在或已过期，调用云函数获取
-      const res = await wx.cloud.callFunction({
-        name: 'enum',
-        data: {
-          action: 'getEnums'
-        }
+      this.setData({
+        'enums.categories': categories,
+        'enums.tastes': tastes,
+        'enums.cookingMethods': cookingMethods,
+        'enums.cookingTimes': cookingTimes,
+        'enums.difficulties': difficulties,
+        'enums.servings': servings
       })
-
-      if (res.result.success) {
-        const enums = res.result.data.enums
-
-        // 缓存到本地，带时间戳
-        wx.setStorageSync('enumsCache', {
-          enums,
-          timestamp: Date.now()
-        })
-
-        this.setEnumsData(enums)
-      }
     } catch (err) {
       console.error('加载枚举失败:', err)
     }
-  },
-
-  // 设置枚举数据
-  setEnumsData(enums) {
-    const categories = enums.filter(e => e.type === 'category' && e.isActive)
-      .sort((a, b) => a.sort - b.sort)
-      .map(e => ({ label: e.label, value: e.value }))
-
-    const tastes = enums.filter(e => e.type === 'taste' && e.isActive)
-      .sort((a, b) => a.sort - b.sort)
-      .map(e => ({ label: e.label, value: e.value }))
-
-    const cookingMethods = enums.filter(e => e.type === 'cookingMethod' && e.isActive)
-      .sort((a, b) => a.sort - b.sort)
-      .map(e => ({ label: e.label, value: e.value }))
-
-    const cookingTimes = enums.filter(e => e.type === 'cookingTime' && e.isActive)
-      .sort((a, b) => a.sort - b.sort)
-      .map(e => ({ label: e.label, value: e.value }))
-
-    const difficulties = enums.filter(e => e.type === 'difficulty' && e.isActive)
-      .sort((a, b) => a.sort - b.sort)
-      .map(e => ({ label: e.label, value: e.value }))
-
-    const servings = enums.filter(e => e.type === 'servings' && e.isActive)
-      .sort((a, b) => a.sort - b.sort)
-      .map(e => ({ label: e.label, value: e.value }))
-
-    this.setData({
-      'enums.categories': categories,
-      'enums.tastes': tastes,
-      'enums.cookingMethods': cookingMethods,
-      'enums.cookingTimes': cookingTimes,
-      'enums.difficulties': difficulties,
-      'enums.servings': servings
-    })
   },
 
   // 枚举值转文本
@@ -154,6 +101,8 @@ Page({
       if (res.result.success) {
         const recipe = res.result.data.recipe
         const canEdit = res.result.data.canEdit
+        const isFavorite = res.result.data.isFavorite
+        const author = res.result.data.author
 
         // 枚举值转文本
         const categoryText = this.getEnumLabel('categories', recipe.category)
@@ -175,9 +124,12 @@ Page({
             cookingTimeText,
             servingsText,
             cookingMethodText,
-            createTime
+            createTime,
+            authorName: author.nickname,
+            authorAvatar: author.avatarUrl
           },
-          isOwner: canEdit
+          isOwner: canEdit,
+          isFavorite
         })
       } else {
         wx.showToast({
@@ -222,15 +174,51 @@ Page({
   },
 
   // 切换收藏
-  toggleFavorite() {
-    const isFavorite = !this.data.isFavorite
-    this.setData({ isFavorite })
+  async toggleFavorite() {
+    const { isFavorite, recipeId } = this.data
 
-    // TODO: 调用云函数
-    wx.showToast({
-      title: isFavorite ? '收藏成功' : '取消收藏',
-      icon: 'success'
-    })
+    // 防止重复点击
+    if (this.favoriteLoading) return
+    this.favoriteLoading = true
+
+    wx.showLoading({ title: isFavorite ? '取消中...' : '收藏中...' })
+
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'favorite',
+        data: {
+          action: isFavorite ? 'removeFavorite' : 'addFavorite',
+          recipeId
+        }
+      })
+
+      wx.hideLoading()
+      this.favoriteLoading = false
+
+      if (res.result.success) {
+        this.setData({
+          isFavorite: !isFavorite
+        })
+
+        wx.showToast({
+          title: isFavorite ? '已取消收藏' : '收藏成功',
+          icon: 'success'
+        })
+      } else {
+        wx.showToast({
+          title: res.result.errorMessage || '操作失败',
+          icon: 'none'
+        })
+      }
+    } catch (err) {
+      wx.hideLoading()
+      this.favoriteLoading = false
+      console.error('收藏操作失败:', err)
+      wx.showToast({
+        title: '操作失败，请重试',
+        icon: 'none'
+      })
+    }
   },
 
   // 编辑菜谱
