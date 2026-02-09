@@ -24,10 +24,10 @@
   <!-- 好友列表 -->
   <view class="content" wx:if="{{activeTab === 0}}">
     <view class="friend-list" wx:if="{{friendList.length > 0}}">
-      <view 
-        class="friend-item" 
-        wx:for="{{friendList}}" 
-        wx:key="id"
+      <view
+        class="friend-item"
+        wx:for="{{friendList}}"
+        wx:key="_openid"
         bindtap="viewFriendRecipes"
         data-friend="{{item}}"
         hover-class="item-hover"
@@ -59,20 +59,15 @@
   <!-- 好友申请 -->
   <view class="content" wx:if="{{activeTab === 1}}">
     <view class="request-list" wx:if="{{requestList.length > 0}}">
-      <view class="request-item" wx:for="{{requestList}}" wx:key="id">
-        <image class="request-avatar" src="{{item.avatarUrl}}" mode="aspectFill"></image>
+      <view class="request-item" wx:for="{{requestList}}" wx:key="_id">
+        <image class="request-avatar" src="{{item.userInfo.avatarUrl}}" mode="aspectFill"></image>
         <view class="request-info">
-          <text class="request-name">{{item.nickname}}</text>
-          <text class="request-time">{{item.createTime}}</text>
+          <text class="request-name">{{item.userInfo.nickname}}</text>
+          <text class="request-time">{{item.createTimeText}}</text>
         </view>
-        <view class="request-actions" wx:if="{{item.status === 0}}">
-          <view class="btn-reject" bindtap="handleRequest" data-id="{{item.id}}" data-action="reject">拒绝</view>
-          <view class="btn-accept" bindtap="handleRequest" data-id="{{item.id}}" data-action="accept">同意</view>
-        </view>
-        <view class="request-status" wx:else>
-          <text class="status-text {{item.status === 1 ? 'accepted' : 'rejected'}}">
-            {{item.status === 1 ? '已同意' : '已拒绝'}}
-          </text>
+        <view class="request-actions">
+          <view class="btn-reject" bindtap="handleRequest" data-request="{{item}}" data-action="reject">拒绝</view>
+          <view class="btn-accept" bindtap="handleRequest" data-request="{{item}}" data-action="accept">同意</view>
         </view>
       </view>
     </view>

@@ -37,7 +37,7 @@ recipe-miniapp/
 
 ## 开发计划
 
-详细的设计方案请查看：[docs/plans/2026-02-03-recipe-miniapp-design.md](docs/plans/2026-02-03-recipe-miniapp-design.md)
+详细的设计方案请查看：[docs/plans/20260203-MVP.md](docs/plans/20260203-MVP.md)
 
 ## 开始开发
 

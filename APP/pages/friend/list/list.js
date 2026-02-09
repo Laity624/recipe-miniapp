@@ -26,60 +26,100 @@ Page({
   },
 
   // 加载好友列表
-  loadFriendList() {
+  async loadFriendList() {
     wx.showLoading({ title: '加载中...' })
 
-    // TODO: 调用云函数获取好友列表
-    setTimeout(() => {
-      const mockData = [
-        {
-          id: 1,
-          nickname: '美食达人',
-          avatarUrl: 'https://picsum.photos/100?random=1',
-          bio: '热爱烹饪，分享美食',
-          recipeCount: 25,
-          favoriteCount: 128
-        },
-        {
-          id: 2,
-          nickname: '厨房小白',
-          avatarUrl: 'https://picsum.photos/100?random=2',
-          bio: '正在学习做菜',
-          recipeCount: 5,
-          favoriteCount: 12
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'friend',
+        data: {
+          action: 'getFriendList'
         }
-      ]
-
-      this.setData({
-        friendList: mockData,
-        friendCount: mockData.length
       })
+
       wx.hideLoading()
-    }, 500)
+
+      if (res.result.success) {
+        const friends = res.result.data.friends
+
+        this.setData({
+          friendList: friends,
+          friendCount: friends.length
+        })
+      } else {
+        wx.showToast({
+          title: res.result.errorMessage || '加载失败',
+          icon: 'none'
+        })
+      }
+    } catch (err) {
+      wx.hideLoading()
+      console.error('加载好友列表失败:', err)
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none'
+      })
+    }
   },
 
   // 加载好友申请列表
-  loadRequestList() {
+  async loadRequestList() {
     wx.showLoading({ title: '加载中...' })
 
-    // TODO: 调用云函数获取申请列表
-    setTimeout(() => {
-      const mockData = [
-        {
-          id: 1,
-          nickname: '新朋友',
-          avatarUrl: 'https://picsum.photos/100?random=3',
-          createTime: '2小时前',
-          status: 0
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'friend',
+        data: {
+          action: 'getFriendRequests',
+          type: 'received'
         }
-      ]
-
-      this.setData({
-        requestList: mockData,
-        requestCount: mockData.filter(item => item.status === 0).length
       })
+
       wx.hideLoading()
-    }, 500)
+
+      if (res.result.success) {
+        const requests = res.result.data.requests
+
+        // 格式化时间
+        requests.forEach(req => {
+          req.createTimeText = this.formatTime(req.createTime)
+        })
+
+        this.setData({
+          requestList: requests,
+          requestCount: requests.length
+        })
+      } else {
+        wx.showToast({
+          title: res.result.errorMessage || '加载失败',
+          icon: 'none'
+        })
+      }
+    } catch (err) {
+      wx.hideLoading()
+      console.error('加载好友申请列表失败:', err)
+      wx.showToast({
+        title: '加载失败',
+        icon: 'none'
+      })
+    }
+  },
+
+  // 格式化时间
+  formatTime(date) {
+    if (!date) return ''
+    const now = new Date()
+    const time = new Date(date)
+    const diff = now - time
+    const minutes = Math.floor(diff / 60000)
+    const hours = Math.floor(diff / 3600000)
+    const days = Math.floor(diff / 86400000)
+
+    if (minutes < 1) return '刚刚'
+    if (minutes < 60) return `${minutes}分钟前`
+    if (hours < 24) return `${hours}小时前`
+    if (days < 7) return `${days}天前`
+    return time.toLocaleDateString()
   },
 
   // 切换 Tab
@@ -110,47 +150,97 @@ Page({
         if (res.tapIndex === 0) {
           this.viewFriendRecipes({ currentTarget: { dataset: { friend } } })
         } else if (res.tapIndex === 1) {
-          this.deleteFriend(friend.id)
+          this.deleteFriend(friend)
         }
       }
     })
   },
 
   // 删除好友
-  deleteFriend(friendId) {
+  deleteFriend(friend) {
     wx.showModal({
       title: '确认删除',
       content: '删除后将无法查看对方的公开菜谱',
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
-          // TODO: 调用云函数删除好友
-          wx.showToast({
-            title: '已删除',
-            icon: 'success'
-          })
-          this.loadFriendList()
+          wx.showLoading({ title: '删除中...' })
+
+          try {
+            const result = await wx.cloud.callFunction({
+              name: 'friend',
+              data: {
+                action: 'deleteFriend',
+                friendOpenid: friend._openid
+              }
+            })
+
+            wx.hideLoading()
+
+            if (result.result.success) {
+              wx.showToast({
+                title: '已删除',
+                icon: 'success'
+              })
+              this.loadFriendList()
+            } else {
+              wx.showToast({
+                title: result.result.errorMessage || '删除失败',
+                icon: 'none'
+              })
+            }
+          } catch (err) {
+            wx.hideLoading()
+            console.error('删除好友失败:', err)
+            wx.showToast({
+              title: '删除失败',
+              icon: 'none'
+            })
+          }
         }
       }
     })
   },
 
   // 处理好友申请
-  handleRequest(e) {
-    const id = e.currentTarget.dataset.id
+  async handleRequest(e) {
+    const request = e.currentTarget.dataset.request
     const action = e.currentTarget.dataset.action
     const isAccept = action === 'accept'
 
     wx.showLoading({ title: '处理中...' })
 
-    // TODO: 调用云函数处理申请
-    setTimeout(() => {
-      wx.hideLoading()
-      wx.showToast({
-        title: isAccept ? '已同意' : '已拒绝',
-        icon: 'success'
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'friend',
+        data: {
+          action: 'handleFriendRequest',
+          requestId: request._id,
+          action: action
+        }
       })
-      this.loadRequestList()
-    }, 500)
+
+      wx.hideLoading()
+
+      if (res.result.success) {
+        wx.showToast({
+          title: isAccept ? '已同意' : '已拒绝',
+          icon: 'success'
+        })
+        this.loadRequestList()
+      } else {
+        wx.showToast({
+          title: res.result.errorMessage || '处理失败',
+          icon: 'none'
+        })
+      }
+    } catch (err) {
+      wx.hideLoading()
+      console.error('处理好友申请失败:', err)
+      wx.showToast({
+        title: '处理失败',
+        icon: 'none'
+      })
+    }
   },
 
   // 搜索好友

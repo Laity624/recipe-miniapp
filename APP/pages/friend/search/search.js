@@ -53,11 +53,11 @@ Page({
   },
 
   // 搜索
-  onSearch() {
-    const keyword = this.data.keyword.trim()
+  async onSearch() {
+    const keyword = this.data.keyword.trim().toUpperCase()
     if (!keyword) {
       wx.showToast({
-        title: '请输入搜索内容',
+        title: '请输入身份码',
         icon: 'none'
       })
       return
@@ -65,32 +65,144 @@ Page({
 
     wx.showLoading({ title: '搜索中...' })
 
-    // TODO: 调用云函数搜索用户
-    setTimeout(() => {
-      // 模拟搜索结果
-      const mockUser = {
-        id: 1,
-        nickname: '美食达人',
-        avatarUrl: 'https://picsum.photos/100?random=1',
-        identityCode: 'ABC123',
-        bio: '热爱烹饪，分享美食',
-        recipeCount: 25,
-        friendCount: 10,
-        isFriend: false,
-        isPending: false
-      }
-
-      this.setData({
-        hasSearched: true,
-        userInfo: keyword === 'ABC123' ? mockUser : null
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'friend',
+        data: {
+          action: 'searchUserByCode',
+          identityCode: keyword
+        }
       })
 
-      if (keyword === 'ABC123') {
+      wx.hideLoading()
+
+      if (res.result.success) {
+        const user = res.result.data.user
+
+        // 检查是否已经是好友或有待处理的请求
+        const isFriend = await this.checkFriendStatus(user._openid)
+
+        this.setData({
+          hasSearched: true,
+          userInfo: {
+            ...user,
+            isFriend: isFriend.isFriend,
+            isPending: isFriend.isPending
+          }
+        })
+
         this.saveHistory(keyword)
+      } else {
+        this.setData({
+          hasSearched: true,
+          userInfo: null
+        })
+
+        if (res.result.errorCode === 'USER_NOT_FOUND') {
+          wx.showToast({
+            title: '未找到该用户',
+            icon: 'none'
+          })
+        } else {
+          wx.showToast({
+            title: res.result.errorMessage || '搜索失败',
+            icon: 'none'
+          })
+        }
+      }
+    } catch (err) {
+      wx.hideLoading()
+      console.error('搜索用户失败:', err)
+      wx.showToast({
+        title: '搜索失败',
+        icon: 'none'
+      })
+    }
+  },
+
+  // 检查好友状态
+  async checkFriendStatus(targetOpenid) {
+    try {
+      // 获取好友列表
+      const friendsRes = await wx.cloud.callFunction({
+        name: 'friend',
+        data: {
+          action: 'getFriendList'
+        }
+      })
+
+      if (friendsRes.result.success) {
+        const friends = friendsRes.result.data.friends
+        const isFriend = friends.some(f => f._openid === targetOpenid)
+        if (isFriend) {
+          return { isFriend: true, isPending: false }
+        }
       }
 
+      // 获取发出的好友请求
+      const requestsRes = await wx.cloud.callFunction({
+        name: 'friend',
+        data: {
+          action: 'getFriendRequests',
+          type: 'sent'
+        }
+      })
+
+      if (requestsRes.result.success) {
+        const requests = requestsRes.result.data.requests
+        const isPending = requests.some(r => r.toOpenid === targetOpenid)
+        return { isFriend: false, isPending }
+      }
+
+      return { isFriend: false, isPending: false }
+    } catch (err) {
+      console.error('检查好友状态失败:', err)
+      return { isFriend: false, isPending: false }
+    }
+  },
+
+  // 发送好友申请
+  async sendRequest() {
+    if (!this.data.userInfo) {
+      return
+    }
+
+    wx.showLoading({ title: '发送中...' })
+
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'friend',
+        data: {
+          action: 'sendFriendRequest',
+          identityCode: this.data.userInfo.identityCode
+        }
+      })
+
       wx.hideLoading()
-    }, 500)
+
+      if (res.result.success) {
+        wx.showToast({
+          title: '申请已发送',
+          icon: 'success'
+        })
+
+        this.setData({
+          'userInfo.isPending': true
+        })
+      } else {
+        wx.showToast({
+          title: res.result.errorMessage || '发送失败',
+          icon: 'none'
+        })
+      }
+    } catch (err) {
+      wx.hideLoading()
+      console.error('发送好友申请失败:', err)
+      wx.showToast({
+        title: '发送失败',
+        icon: 'none'
+      })
+    }
   },
 
   // 点击历史记录
@@ -119,21 +231,47 @@ Page({
   },
 
   // 发送好友申请
-  sendRequest() {
+  async sendRequest() {
+    if (!this.data.userInfo) {
+      return
+    }
+
     wx.showLoading({ title: '发送中...' })
 
-    // TODO: 调用云函数发送好友申请
-    setTimeout(() => {
-      wx.hideLoading()
-      wx.showToast({
-        title: '申请已发送',
-        icon: 'success'
+    try {
+      const res = await wx.cloud.callFunction({
+        name: 'friend',
+        data: {
+          action: 'sendFriendRequest',
+          identityCode: this.data.userInfo.identityCode
+        }
       })
 
-      this.setData({
-        'userInfo.isPending': true
+      wx.hideLoading()
+
+      if (res.result.success) {
+        wx.showToast({
+          title: '申请已发送',
+          icon: 'success'
+        })
+
+        this.setData({
+          'userInfo.isPending': true
+        })
+      } else {
+        wx.showToast({
+          title: res.result.errorMessage || '发送失败',
+          icon: 'none'
+        })
+      }
+    } catch (err) {
+      wx.hideLoading()
+      console.error('发送好友申请失败:', err)
+      wx.showToast({
+        title: '发送失败',
+        icon: 'none'
       })
-    }, 500)
+    }
   }
 })
 

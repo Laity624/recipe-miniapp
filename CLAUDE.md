@@ -11,7 +11,7 @@
 
 ## 项目文档
 
-- **设计文档**：`docs/plans/2026-02-03-recipe-miniapp-design.md`
+- **设计文档**：`docs/plans/20260203-MVP.md`
 - **UI 设计规范**：`docs/standards/UI设计规范.md`
 - **代码编写规范（核心）**：`docs/standards/代码编写规范-核心.md` ⭐
 - **代码编写规范（详细）**：`docs/standards/代码编写规范.md`
@@ -24,6 +24,7 @@
 - **优先使用 vant-weapp 组件库**，能使用的就使用
 - 必须使用 CSS 变量（定义在 `APP/app.wxss`），不要硬编码颜色和间距
 - 优先使用 `async/await`，必须用 `try-catch` 处理错误
+- 常用的、可复用的工具函数封装到 `APP/utils` 目录下，供全局使用
 
 ### UI 规范
 - 页面背景必须使用 `--bg-color` (#FAFAF8)，不要使用纯白

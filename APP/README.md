@@ -80,6 +80,6 @@ APP/
 
 ## 相关文档
 
-- [设计方案](../docs/plans/2026-02-03-recipe-miniapp-design.md)
+- [设计方案](../docs/plans/20260203-MVP.md)
 - [UI 设计规范](../docs/plans/UI.md)
 
